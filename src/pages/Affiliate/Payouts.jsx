@@ -109,7 +109,7 @@ export default function AffiliatePayouts() {
                   <td colSpan={8}>
                     <div className="empty-state">
                       <div className="empty-icon">✅</div>
-                      <div className="empty-title">No payouts in this category</div>
+                      <div className="empty-title">No Payouts in this category</div>
                     </div>
                   </td>
                 </tr>
