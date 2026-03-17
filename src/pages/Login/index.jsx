@@ -18,10 +18,10 @@ export default function Login() {
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 36 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
         <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,var(--accent),var(--accent2))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>
-          NV
+          G
         </div>
         <div style={{ fontWeight: 700, fontSize: 17, letterSpacing: '-0.3px' }}>
-          Nexus<span style={{ color: 'var(--accent)' }}>Vault</span> Admin
+          Grow<span style={{ color: 'var(--accent)' }}>ith</span> Admin
         </div>
       </div>
 
@@ -37,7 +37,7 @@ export default function Login() {
             className="filter-input"
             style={{ width: '100%' }}
             type="email"
-            placeholder="admin@nexusvault.io"
+            placeholder="admin@growith.io"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             required

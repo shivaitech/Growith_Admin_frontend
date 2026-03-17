@@ -39,9 +39,9 @@ export const referrals = [
 ];
 
 export const adminRoles = [
-  { id: 1, name: 'Alex Morgan', email: 'alex@nexusvault.io', role: 'Master Admin', permissions: ['all'], status: 'Active' },
-  { id: 2, name: 'Sam Torres', email: 'sam@nexusvault.io', role: 'Admin', permissions: ['kyc', 'payments', 'investors'], status: 'Active' },
-  { id: 3, name: 'Dana Lee', email: 'dana@nexusvault.io', role: 'KYC Manager', permissions: ['kyc'], status: 'Active' },
+  { id: 1, name: 'Alex Morgan', email: 'alex@growith.io', role: 'Master Admin', permissions: ['all'], status: 'Active' },
+  { id: 2, name: 'Sam Torres', email: 'sam@growith.io', role: 'Admin', permissions: ['kyc', 'payments', 'investors'], status: 'Active' },
+  { id: 3, name: 'Dana Lee', email: 'dana@growith.io', role: 'KYC Manager', permissions: ['kyc'], status: 'Active' },
 ];
 
 export const notifications = [
@@ -63,4 +63,73 @@ export const affiliatePayouts = [
   { id: 'PO-002', affiliate: "James O'Brien", amount: 7250, method: 'Wire Transfer', wallet: 'IBAN/IE29...', requested: '2024-04-19', status: 'Pending' },
   { id: 'PO-003', affiliate: 'Chen Wei', amount: 840, method: 'USDT', wallet: '0x9c4e...2b31', requested: '2024-04-18', status: 'Approved' },
   { id: 'PO-004', affiliate: 'Marco Bianchi', amount: 135, method: 'Bank Transfer', wallet: 'IT60...', requested: '2024-04-15', status: 'Approved' },
+];
+
+// ── Token Management ──────────────────────────────────────────────
+export const tokenList = [
+  {
+    id: 'shivai', name: 'ShivAI', ticker: 'SHVAI',
+    description: 'AI Infrastructure Token — EU-registered private placement on Polygon',
+    status: 'LIVE', blockchain: 'Polygon', standard: 'ERC-20',
+    issuancePrice: 0.01, totalSupply: 10_000_000_000, targetRaise: 5_000_000,
+    totalRaised: 892_500, holders: 47, tokensMinted: 89_250_000, pendingMints: 2,
+    launchDate: 'Jan 2024', accessType: 'OPEN', lockPeriod: '12 months',
+    contractAddress: '0x742d35Cc6634C0532925a3b8D4C9b8E2a1F2D1a5',
+  },
+  {
+    id: 'greenvolt', name: 'GreenVolt', ticker: 'GVT',
+    description: 'Clean Energy Series A — Tokenized infrastructure investment',
+    status: 'COMING SOON', blockchain: 'Polygon', standard: 'ERC-20',
+    issuancePrice: null, totalSupply: null, targetRaise: null,
+    totalRaised: 0, holders: 0, tokensMinted: 0, pendingMints: 0,
+    launchDate: 'Q3 2026', accessType: 'CLOSED', lockPeriod: 'TBA', contractAddress: null,
+  },
+  {
+    id: 'novamed', name: 'NovaMed', ticker: 'NMD',
+    description: 'HealthTech Token — Private placement structure',
+    status: 'COMING SOON', blockchain: 'Polygon', standard: 'ERC-20',
+    issuancePrice: null, totalSupply: null, targetRaise: null,
+    totalRaised: 0, holders: 0, tokensMinted: 0, pendingMints: 0,
+    launchDate: 'Q4 2026', accessType: 'CLOSED', lockPeriod: 'TBA', contractAddress: null,
+  },
+  {
+    id: 'quantumpay', name: 'QuantumPay', ticker: 'QPY',
+    description: 'Fintech Series B — Payment infrastructure token',
+    status: 'COMING SOON', blockchain: 'Polygon', standard: 'ERC-20',
+    issuancePrice: null, totalSupply: null, targetRaise: null,
+    totalRaised: 0, holders: 0, tokensMinted: 0, pendingMints: 0,
+    launchDate: 'Q1 2027', accessType: 'CLOSED', lockPeriod: 'TBA', contractAddress: null,
+  },
+];
+
+export const shivaiRaiseHistory = [
+  { month: 'Jan 2024', raised: 85000, investors: 4 },
+  { month: 'Feb 2024', raised: 204000, investors: 11 },
+  { month: 'Mar 2024', raised: 380000, investors: 28 },
+  { month: 'Apr 2024', raised: 892500, investors: 47 },
+];
+
+export const tokenInvestors = [
+  { id: 1, name: 'Chen Wei',      email: 'chen@cryptobase.cn',  country: 'CN', invested: 110000, tokens: 11000000, vestingPct: 0,  lockExpiry: '2025-04-18', mintStatus: 'Pending Mint', mintDate: null,         paymentRef: '0x4d7b...f102', kyc: 'Approved' },
+  { id: 2, name: "James O'Brien", email: 'james@capvault.ie',   country: 'IE', invested: 95000,  tokens: 9500000,  vestingPct: 40, lockExpiry: '2025-03-28', mintStatus: 'Minted',       mintDate: '2024-03-28', paymentRef: 'SWIFT/88420',   kyc: 'Approved' },
+  { id: 3, name: 'Arjun Mehta',   email: 'arjun@techwave.io',   country: 'IN', invested: 42500,  tokens: 4250000,  vestingPct: 40, lockExpiry: '2025-04-01', mintStatus: 'Minted',       mintDate: '2024-04-01', paymentRef: 'NEFT/234561',   kyc: 'Approved' },
+  { id: 4, name: 'Marco Bianchi', email: 'marco@tokeniq.it',    country: 'IT', invested: 67000,  tokens: 6700000,  vestingPct: 40, lockExpiry: '2025-01-25', mintStatus: 'Minted',       mintDate: '2024-01-25', paymentRef: 'SWIFT/ITL002',  kyc: 'Approved' },
+  { id: 5, name: 'Yuki Tanaka',   email: 'yuki@blockfin.jp',    country: 'JP', invested: 28000,  tokens: 2800000,  vestingPct: 0,  lockExpiry: '2025-03-29', mintStatus: 'KYC Review',   mintDate: null,         paymentRef: 'SWIFT/JP3309',  kyc: 'Manual Review' },
+  { id: 6, name: 'Aisha Kamara',  email: 'aisha@afrivest.ng',   country: 'NG', invested: 12500,  tokens: 1250000,  vestingPct: 0,  lockExpiry: '2025-04-15', mintStatus: 'Pending Mint', mintDate: null,         paymentRef: 'NEFT/290012',   kyc: 'Approved' },
+  { id: 7, name: 'Sofia Reyes',   email: 'sofia@nexgen.co',     country: 'MX', invested: 18000,  tokens: 1800000,  vestingPct: 0,  lockExpiry: null,         mintStatus: 'KYC Pending',  mintDate: null,         paymentRef: '0x8f3a...c9e2', kyc: 'Pending' },
+];
+
+export const pendingMints = [
+  { id: 'MINT-001', investor: 'Chen Wei',     email: 'chen@cryptobase.cn', amount: 110000, tokens: 11000000, paymentRef: '0x4d7b...f102', method: 'USDT (TRC20)',   paymentDate: '2024-04-18', kyc: 'Approved', wallet: '0x9c4e...2b31' },
+  { id: 'MINT-002', investor: 'Aisha Kamara', email: 'aisha@afrivest.ng',  amount: 12500,  tokens: 1250000,  paymentRef: 'NEFT/290012',   method: 'Bank Transfer',  paymentDate: '2024-04-15', kyc: 'Approved', wallet: 'Pending Generation' },
+];
+
+export const vestingSchedule = [
+  { milestone: 'TGE',      date: 'Apr 2024', releaseType: 'Lock Begin', pct: 0,  tokens: 0,        status: 'Released', note: 'No tokens released at TGE' },
+  { milestone: 'Month 3',  date: 'Jul 2024', releaseType: 'Partial',    pct: 10, tokens: 8925000,  status: 'Released', note: null },
+  { milestone: 'Month 6',  date: 'Oct 2024', releaseType: 'Partial',    pct: 15, tokens: 13387500, status: 'Released', note: null },
+  { milestone: 'Month 9',  date: 'Jan 2025', releaseType: 'Partial',    pct: 15, tokens: 13387500, status: 'Upcoming', note: null },
+  { milestone: 'Month 12', date: 'Apr 2025', releaseType: 'Partial',    pct: 20, tokens: 17850000, status: 'Upcoming', note: null },
+  { milestone: 'Month 18', date: 'Oct 2025', releaseType: 'Partial',    pct: 20, tokens: 17850000, status: 'Upcoming', note: null },
+  { milestone: 'Month 24', date: 'Apr 2026', releaseType: 'Final',      pct: 20, tokens: 17850000, status: 'Upcoming', note: 'Full unlock at 24 months' },
 ];

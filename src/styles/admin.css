@@ -1,4 +1,4 @@
-/* ── NexusVault Admin Design System ─────────────────────────────── */
+/* ── Growith Admin Design System ─────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f8f9fb;--surface:#ffffff;--surface2:#f1f3f7;--border:#e4e7ef;
@@ -19,9 +19,12 @@ html,body,#root{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg
 .nv-sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:all 0.25s ease;overflow:hidden;flex-shrink:0}
 .nv-sidebar.collapsed{width:60px}
 .sidebar-logo{height:var(--nav-h);display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);gap:10px;overflow:hidden}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
-.logo-text{font-weight:700;font-size:15px;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden}
-.logo-text span{color:var(--accent)}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#5C27FE,#DEC7FF);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0}
+.logo-text{display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.logo-brand{font-weight:800;font-size:16px;letter-spacing:-0.5px;white-space:nowrap;background:linear-gradient(264.28deg,#DEC7FF -38.2%,#5C27FE 103.12%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.logo-tagline{font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.logo-img{height:32px;width:auto;object-fit:contain;max-width:140px}
+.logo-img-sm{height:32px;width:32px;object-fit:contain}
 .sidebar-nav{flex:1;overflow-y:auto;padding:8px}
 .nav-section{margin-bottom:4px}
 .nav-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:10px 12px 4px;white-space:nowrap;overflow:hidden}

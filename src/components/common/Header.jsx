@@ -19,6 +19,8 @@ const routeLabels = {
   '/affiliate/affiliates': 'All Affiliates',
   '/affiliate/commissions': 'Commission Structure',
   '/affiliate/payouts': 'Commission Payouts',
+  '/token': 'Token Marketplace',
+  '/token/shivai': 'ShivAI Token Management',
   '/roles': 'Admin Role Control',
   '/settings': 'Platform Settings',
 };
@@ -116,7 +118,7 @@ export default function Header() {
             <div className="profile-panel animate-in" onClick={(e) => e.stopPropagation()}>
               <div className="profile-header">
                 <div className="profile-name">{user?.name ?? 'Alex Morgan'}</div>
-                <div className="profile-role">Master Admin · NexusVault</div>
+                <div className="profile-role">Master Admin · Growith</div>
               </div>
               {[
                 { icon: 'user', label: 'Profile Settings' },

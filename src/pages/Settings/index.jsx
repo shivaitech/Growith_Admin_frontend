@@ -1,7 +1,7 @@
 import Icon from '../../components/common/Icon';
 
 const tokenConfig = [
-  { l: 'Token Name', v: 'NVT (NexusVault Token)' },
+  { l: 'Token Name', v: 'GWT (Growith Token)' },
   { l: 'Contract Address', v: '0x742d...8e4f' },
   { l: 'Token Price', v: '$0.05 / NVT' },
   { l: 'Total Supply', v: '100,000,000 NVT' },
@@ -25,7 +25,7 @@ export default function Settings() {
       <div className="page-header">
         <div>
           <div className="page-title">Platform Settings</div>
-          <div className="page-sub">Configure your NexusVault investment platform</div>
+          <div className="page-sub">Configure your Growith investment platform</div>
         </div>
         <button className="btn btn-primary">Save Changes</button>
       </div>

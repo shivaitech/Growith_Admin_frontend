@@ -8,7 +8,8 @@ import Dashboard from '../pages/Dashboard';
 import Investors from '../pages/Users';
 import KYC from '../pages/KYC';
 import Payments from '../pages/Payments';
-import Token from '../pages/Token';
+import TokenManagement from '../pages/TokenManagement';
+import ShivAI from '../pages/TokenManagement/ShivAI';
 import Airdrop from '../pages/Airdrop';
 import Withdrawals from '../pages/Withdrawals';
 import AffiliateOverview from '../pages/Affiliate/Overview';
@@ -34,7 +35,8 @@ const router = createBrowserRouter([
       { path: 'investors', element: <Investors /> },
       { path: 'kyc', element: <KYC /> },
       { path: 'payments', element: <Payments /> },
-      { path: 'token', element: <Token /> },
+      { path: 'token', element: <TokenManagement /> },
+      { path: 'token/shivai', element: <ShivAI /> },
       { path: 'airdrop', element: <Airdrop /> },
       { path: 'withdrawals', element: <Withdrawals /> },
       { path: 'affiliate', element: <AffiliateOverview /> },

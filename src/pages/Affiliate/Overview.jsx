@@ -81,7 +81,7 @@ export default function AffiliateOverview() {
             <div className="info-row" key={l.id}>
               <div>
                 <div style={{ fontWeight: 500, fontSize: 13 }}>{l.affiliate}</div>
-                <div style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'DM Mono' }}>nexusvault.io/ref/{l.code}</div>
+                <div style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'DM Mono' }}>growith.io/ref/{l.code}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 12, color: 'var(--text2)' }}>{l.clicks} clicks · {l.signups} signups</div>

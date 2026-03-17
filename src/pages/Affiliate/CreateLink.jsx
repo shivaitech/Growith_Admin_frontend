@@ -3,7 +3,7 @@ import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import { affiliateLinks } from '../../data/mockData';
 
-const BASE_URL = 'https://nexusvault.io/ref/';
+const BASE_URL = 'https://growith.io/ref/';
 
 function genCode(name) {
   return name.trim().toUpperCase().replace(/\s+/g, '-').slice(0, 10) + '-' + Math.random().toString(36).slice(2, 5).toUpperCase();

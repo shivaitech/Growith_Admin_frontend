@@ -8,7 +8,11 @@ const navMain = [
   { to: '/investors', label: 'Investors', icon: 'users' },
   { to: '/kyc', label: 'KYC Management', icon: 'kyc', badge: 3 },
   { to: '/payments', label: 'Payments', icon: 'payment', badge: 3 },
-  { to: '/token', label: 'Token Allocation', icon: 'token' },
+];
+
+const navToken = [
+  { to: '/token', label: 'Marketplace', icon: 'token', end: true },
+  { to: '/token/shivai', label: 'ShivAI ● LIVE', icon: 'token', badge: 2 },
 ];
 
 const navFinance = [
@@ -66,15 +70,23 @@ export default function Sidebar({ onClose }) {
   return (
     <aside className={classes}>
       <div className="sidebar-logo">
-        <div className="logo-icon">NV</div>
+        <div className="logo-icon">G</div>
         {!sidebarCollapsed && (
-          <div className="logo-text">Nexus<span>Vault</span></div>
+          <div className="logo-text">
+            <span className="logo-brand">Growith</span>
+            <span className="logo-tagline">Invest. Grow. Repeat.</span>
+          </div>
         )}
       </div>
 
       <nav className="sidebar-nav">
         {!sidebarCollapsed && <div className="nav-label">Main</div>}
         {navMain.map((item) => (
+          <NavItem key={item.to} {...item} collapsed={sidebarCollapsed} onNavClick={closeMobile} />
+        ))}
+
+        {!sidebarCollapsed && <div className="nav-label">Token Management</div>}
+        {navToken.map((item) => (
           <NavItem key={item.to} {...item} collapsed={sidebarCollapsed} onNavClick={closeMobile} />
         ))}
 
