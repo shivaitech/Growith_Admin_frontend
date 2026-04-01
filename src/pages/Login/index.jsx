@@ -100,7 +100,7 @@ export default function Login() {
             />
             Remember me
           </label>
-          <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 500, textDecoration: 'none' }}>
+          <Link to="/auth/forgot-password" style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 500, textDecoration: 'none' }}>
             Forgot password?
           </Link>
         </div>

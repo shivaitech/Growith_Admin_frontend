@@ -20,6 +20,9 @@ import AffiliatePayouts from '../pages/Affiliate/Payouts';
 import AdminRoles from '../pages/AdminRoles';
 import Settings from '../pages/Settings';
 import Login from '../pages/Login';
+import ForgotPassword from '../pages/ForgotPassword';
+import VerifyCode from '../pages/VerifyCode';
+import ResetPassword from '../pages/ResetPassword';
 import NotFound from '../pages/NotFound';
 
 const router = createBrowserRouter([
@@ -52,7 +55,12 @@ const router = createBrowserRouter([
   {
     path: '/auth',
     element: <AuthLayout />,
-    children: [{ path: 'login', element: <Login /> }],
+    children: [
+      { path: 'login', element: <Login /> },
+      { path: 'forgot-password', element: <ForgotPassword /> },
+      { path: 'verify-code', element: <VerifyCode /> },
+      { path: 'reset-password', element: <ResetPassword /> },
+    ],
   },
   { path: '*', element: <NotFound /> },
 ]);
