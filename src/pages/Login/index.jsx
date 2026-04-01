@@ -1,17 +1,37 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { loginSuccess } from '../../store/slices/authSlice';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import Icon from '../../components/common/Icon';
 
 export default function Login() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { login, loading, error } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Load remembered email on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_remember_email');
+    if (saved) {
+      setForm((f) => ({ ...f, email: saved }));
+      setRemember(true);
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(loginSuccess({ user: { name: 'Admin', email: form.email }, token: 'demo-token' }));
-    navigate('/');
+    try {
+      if (remember) {
+        localStorage.setItem('admin_remember_email', form.email);
+      } else {
+        localStorage.removeItem('admin_remember_email');
+      }
+      await login(form);
+      navigate('/');
+    } catch {
+      // error is already set in Redux state via useAuth
+    }
   };
 
   return (
@@ -45,18 +65,51 @@ export default function Login() {
         </div>
         <div>
           <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text2)', display: 'block', marginBottom: 6 }}>Password</label>
-          <input
-            className="filter-input"
-            style={{ width: '100%' }}
-            type="password"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              className="filter-input"
+              style={{ width: '100%', paddingRight: 38 }}
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', padding: 2,
+                display: 'flex', alignItems: 'center',
+              }}
+              tabIndex={-1}
+            >
+              <Icon n={showPassword ? 'eye' : 'lock'} size={15} />
+            </button>
+          </div>
         </div>
-        <button className="btn btn-primary" style={{ justifyContent: 'center', padding: '10px 16px', marginTop: 4 }} type="submit">
-          Sign In
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: -2 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 12, color: 'var(--text2)' }}>
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              style={{ accentColor: 'var(--accent)', width: 14, height: 14, cursor: 'pointer' }}
+            />
+            Remember me
+          </label>
+          <Link to="/forgot-password" style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 500, textDecoration: 'none' }}>
+            Forgot password?
+          </Link>
+        </div>
+
+        {error && (
+          <div style={{ color: '#ef4444', fontSize: 13, marginTop: -4 }}>{error}</div>
+        )}
+        <button className="btn btn-primary" style={{ justifyContent: 'center', padding: '10px 16px', marginTop: 4, opacity: loading ? 0.7 : 1 }} type="submit" disabled={loading}>
+          {loading ? 'Signing in…' : 'Sign In'}
         </button>
       </form>
 

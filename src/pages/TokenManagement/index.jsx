@@ -16,8 +16,8 @@ export default function TokenManagement() {
           <div className="page-title">Token Marketplace</div>
           <div className="page-sub">Manage all tokenised offerings on the Growith platform</div>
         </div>
-        <button className="btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-          <Icon n="plus" size={13} /> Add Token
+        <button className="btn btn-primary" disabled style={{ opacity: 0.5, cursor: 'not-allowed', padding: '10px 20px', fontSize: 14, fontWeight: 600, gap: 8 }}>
+          <Icon n="plus" size={15} /> Add Token
         </button>
       </div>
 

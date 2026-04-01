@@ -13,7 +13,7 @@ import ShivAI from '../pages/TokenManagement/ShivAI';
 import Airdrop from '../pages/Airdrop';
 import Withdrawals from '../pages/Withdrawals';
 import AffiliateOverview from '../pages/Affiliate/Overview';
-import AffiliateCreateLink from '../pages/Affiliate/CreateLink';
+import AffiliatePrograms from '../pages/Affiliate/Programs';
 import AffiliatesList from '../pages/Affiliate/AffiliatesList';
 import AffiliateCommissions from '../pages/Affiliate/Commissions';
 import AffiliatePayouts from '../pages/Affiliate/Payouts';
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
       { path: 'airdrop', element: <Airdrop /> },
       { path: 'withdrawals', element: <Withdrawals /> },
       { path: 'affiliate', element: <AffiliateOverview /> },
-      { path: 'affiliate/create-link', element: <AffiliateCreateLink /> },
+      { path: 'affiliate/programs', element: <AffiliatePrograms /> },
       { path: 'affiliate/affiliates', element: <AffiliatesList /> },
       { path: 'affiliate/commissions', element: <AffiliateCommissions /> },
       { path: 'affiliate/payouts', element: <AffiliatePayouts /> },

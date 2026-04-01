@@ -22,7 +22,7 @@ const navFinance = [
 
 const navAffiliate = [
   { to: '/affiliate', label: 'Overview', icon: 'affiliate', end: true },
-  { to: '/affiliate/create-link', label: 'Create Referral Link', icon: 'link' },
+  { to: '/affiliate/programs', label: 'Programs', icon: 'link' },
   { to: '/affiliate/affiliates', label: 'All Affiliates', icon: 'users' },
   { to: '/affiliate/commissions', label: 'Commissions', icon: 'percent' },
   { to: '/affiliate/payouts', label: 'Payouts', icon: 'payout', badge: 2 },

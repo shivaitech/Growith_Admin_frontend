@@ -40,8 +40,8 @@ export default function AffiliateOverview() {
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/affiliate/payouts')}>
             <Icon n="payout" size={13} />Payouts
           </button>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/affiliate/create-link')}>
-            <Icon n="plus" size={13} />Create Link
+          <button className="btn btn-primary btn-sm" onClick={() => navigate('/affiliate/programs')}>
+            <Icon n="plus" size={13} />Create Program
           </button>
         </div>
       </div>
@@ -89,8 +89,8 @@ export default function AffiliateOverview() {
               </div>
             </div>
           ))}
-          <button className="btn btn-ghost btn-sm" style={{ marginTop: 14, width: '100%', justifyContent: 'center' }} onClick={() => navigate('/affiliate/create-link')}>
-            <Icon n="link" size={13} />Manage All Links
+          <button className="btn btn-ghost btn-sm" style={{ marginTop: 14, width: '100%', justifyContent: 'center' }} onClick={() => navigate('/affiliate/programs')}>
+            <Icon n="link" size={13} />Manage All Programs
           </button>
         </div>
 

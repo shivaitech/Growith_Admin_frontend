@@ -1,13 +1,20 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import { withdrawals as initialWithdrawals } from '../../data/mockData';
 
+const fmtNow = () => {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+};
+
 export default function Withdrawals() {
   const [items, setItems] = useState(initialWithdrawals);
+  const currentUser = useSelector((s) => s.auth.user?.name || 'Admin');
 
   const handleAction = (id, action) =>
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: action } : i)));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: action, actionBy: currentUser, actionAt: fmtNow() } : i)));
 
   const pending = items.filter((i) => i.status === 'Pending').length;
 
@@ -37,7 +44,14 @@ export default function Withdrawals() {
                   <td style={{ fontFamily: 'DM Mono', fontWeight: 700, color: 'var(--emerald)' }}>${w.amount.toLocaleString()}</td>
                   <td style={{ fontFamily: 'DM Mono', fontSize: 11, color: 'var(--text2)' }}>{w.wallet}</td>
                   <td className="td-muted">{w.requested}</td>
-                  <td><Badge status={w.status} /></td>
+                  <td>
+                    <Badge status={w.status} />
+                    {w.actionBy && (
+                      <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4, whiteSpace: 'nowrap' }}>
+                        By {w.actionBy} · {w.actionAt}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     {w.status === 'Pending' && (
                       <div style={{ display: 'flex', gap: 6 }}>
@@ -49,7 +63,7 @@ export default function Withdrawals() {
                         </button>
                       </div>
                     )}
-                    {w.status !== 'Pending' && <Badge status={w.status} />}
+                    {w.status !== 'Pending' && <span className="td-muted">—</span>}
                   </td>
                 </tr>
               ))}

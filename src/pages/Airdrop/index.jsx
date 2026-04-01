@@ -55,7 +55,7 @@ export default function Airdrop() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{i.name}</div>
-                <div style={{ fontSize: 11, color: 'var(--text3)' }}>{i.tokens.toLocaleString()} tokens</div>
+                <div style={{ fontSize: 11, color: 'var(--text3)' }}>{(i.purchasedTokens + i.airdropTokens).toLocaleString()} tokens</div>
               </div>
               {sent[i.id] ? <span className="badge badge-green" style={{ fontSize: 10 }}>Sent</span> : <Badge status={i.kyc} />}
             </div>

@@ -1,15 +1,22 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import PaymentModal from '../../components/common/PaymentModal';
 import { payments as initialPayments } from '../../data/mockData';
 
+const fmtNow = () => {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+};
+
 export default function Payments() {
   const [modal, setModal] = useState(null);
   const [items, setItems] = useState(initialPayments);
+  const currentUser = useSelector((s) => s.auth.user?.name || 'Admin');
 
   const handleAction = (id, status) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status, actionBy: currentUser, actionAt: fmtNow() } : i)));
     setModal(null);
   };
 
@@ -67,7 +74,14 @@ export default function Payments() {
                   <td><span className="chip" style={{ fontSize: 11, padding: '3px 8px' }}>{p.method}</span></td>
                   <td style={{ fontFamily: 'DM Mono', fontSize: 11, color: 'var(--text2)' }}>{p.ref}</td>
                   <td className="td-muted">{p.date}</td>
-                  <td><Badge status={p.status} /></td>
+                  <td>
+                    <Badge status={p.status} />
+                    {p.actionBy && (
+                      <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4, whiteSpace: 'nowrap' }}>
+                        By {p.actionBy} · {p.actionAt}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     {p.status === 'Pending' ? (
                       <div style={{ display: 'flex', gap: 6 }}>

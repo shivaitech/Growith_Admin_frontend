@@ -1,12 +1,19 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import Initials from '../../components/common/Initials';
 import { affiliatePayouts } from '../../data/mockData';
 
+const fmtNow = () => {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+};
+
 export default function AffiliatePayouts() {
   const [payouts, setPayouts] = useState(affiliatePayouts);
   const [tab, setTab] = useState('All');
+  const currentUser = useSelector((s) => s.auth.user?.name || 'Admin');
 
   const pending = payouts.filter((p) => p.status === 'Pending');
   const approved = payouts.filter((p) => p.status === 'Approved');
@@ -15,8 +22,8 @@ export default function AffiliatePayouts() {
 
   const filtered = tab === 'All' ? payouts : payouts.filter((p) => p.status === tab);
 
-  const approve = (id) => setPayouts(payouts.map((p) => p.id === id ? { ...p, status: 'Approved' } : p));
-  const reject = (id) => setPayouts(payouts.map((p) => p.id === id ? { ...p, status: 'Rejected' } : p));
+  const approve = (id) => setPayouts(payouts.map((p) => p.id === id ? { ...p, status: 'Approved', actionBy: currentUser, actionAt: fmtNow() } : p));
+  const reject = (id) => setPayouts(payouts.map((p) => p.id === id ? { ...p, status: 'Rejected', actionBy: currentUser, actionAt: fmtNow() } : p));
 
   return (
     <div className="animate-in">
@@ -88,6 +95,11 @@ export default function AffiliatePayouts() {
                   <td className="td-muted">{p.requested}</td>
                   <td>
                     <Badge status={p.status === 'Rejected' ? 'Rejected' : p.status === 'Approved' ? 'Approved' : 'Pending'} />
+                    {p.actionBy && (
+                      <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4, whiteSpace: 'nowrap' }}>
+                        By {p.actionBy} · {p.actionAt}
+                      </div>
+                    )}
                   </td>
                   <td>
                     {p.status === 'Pending' && (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import Initials from '../../components/common/Initials';
@@ -7,15 +8,21 @@ import { kycItems as initialKYC } from '../../data/mockData';
 
 const tabs = ['Pending', 'Approved', 'Rejected', 'Manual Review'];
 
+const fmtNow = () => {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+};
+
 export default function KYC() {
   const [tab, setTab] = useState('Pending');
   const [modal, setModal] = useState(null);
   const [items, setItems] = useState(initialKYC);
+  const currentUser = useSelector((s) => s.auth.user?.name || 'Admin');
 
   const filtered = items.filter((i) => i.status === tab);
 
   const handleAction = (id, action) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: action } : i)));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: action, actionBy: currentUser, actionAt: fmtNow() } : i)));
     setModal(null);
   };
 
@@ -95,7 +102,14 @@ export default function KYC() {
                     <td><span className="chip" style={{ fontSize: 11, padding: '3px 8px' }}>{k.country}</span></td>
                     <td className="td-muted">{k.docType}</td>
                     <td className="td-muted">{k.submitted}</td>
-                    <td><Badge status={k.status} /></td>
+                    <td>
+                      <Badge status={k.status} />
+                      {k.actionBy && (
+                        <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4, whiteSpace: 'nowrap' }}>
+                          By {k.actionBy} · {k.actionAt}
+                        </div>
+                      )}
+                    </td>
                     <td>
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button className="btn btn-ghost btn-sm" onClick={() => setModal(k)}>

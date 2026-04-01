@@ -26,7 +26,7 @@ export default function CreateLink() {
     setForm({ affiliate: '', campaign: '', code: '', tier: 'L1' });
   };
 
-  const copy = (text, id) => {
+  const copy = (text, id) => { 
     navigator.clipboard?.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);

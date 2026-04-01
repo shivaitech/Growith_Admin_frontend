@@ -1,13 +1,13 @@
 // ── Mock Data ─────────────────────────────────────────────────────
 export const investors = [
-  { id: 1, name: 'Arjun Mehta', email: 'arjun@techwave.io', country: 'IN', kyc: 'Approved', invested: 42500, tokens: 85000, joined: '2024-03-12' },
-  { id: 2, name: 'Sofia Reyes', email: 'sofia@nexgen.co', country: 'MX', kyc: 'Pending', invested: 18000, tokens: 36000, joined: '2024-04-02' },
-  { id: 3, name: "James O'Brien", email: 'james@capvault.ie', country: 'IE', kyc: 'Approved', invested: 95000, tokens: 190000, joined: '2024-02-18' },
-  { id: 4, name: 'Yuki Tanaka', email: 'yuki@blockfin.jp', country: 'JP', kyc: 'Manual Review', invested: 28000, tokens: 56000, joined: '2024-03-29' },
-  { id: 5, name: 'Priya Sharma', email: 'priya@defilab.in', country: 'IN', kyc: 'Rejected', invested: 0, tokens: 0, joined: '2024-04-10' },
-  { id: 6, name: 'Marco Bianchi', email: 'marco@tokeniq.it', country: 'IT', kyc: 'Approved', invested: 67000, tokens: 134000, joined: '2024-01-25' },
-  { id: 7, name: 'Aisha Kamara', email: 'aisha@afrivest.ng', country: 'NG', kyc: 'Pending', invested: 12500, tokens: 25000, joined: '2024-04-15' },
-  { id: 8, name: 'Chen Wei', email: 'chen@cryptobase.cn', country: 'CN', kyc: 'Approved', invested: 110000, tokens: 220000, joined: '2024-01-10' },
+  { id: 1, name: 'Arjun Mehta', email: 'arjun@techwave.io', country: 'IN', kyc: 'Approved', invested: 42500, purchasedTokens: 85000, airdropTokens: 5000, joined: '2024-03-12' },
+  { id: 2, name: 'Sofia Reyes', email: 'sofia@nexgen.co', country: 'MX', kyc: 'Pending', invested: 18000, purchasedTokens: 36000, airdropTokens: 0, joined: '2024-04-02' },
+  { id: 3, name: "James O'Brien", email: 'james@capvault.ie', country: 'IE', kyc: 'Approved', invested: 95000, purchasedTokens: 190000, airdropTokens: 10000, joined: '2024-02-18' },
+  { id: 4, name: 'Yuki Tanaka', email: 'yuki@blockfin.jp', country: 'JP', kyc: 'Manual Review', invested: 28000, purchasedTokens: 56000, airdropTokens: 2500, joined: '2024-03-29' },
+  { id: 5, name: 'Priya Sharma', email: 'priya@defilab.in', country: 'IN', kyc: 'Rejected', invested: 0, purchasedTokens: 0, airdropTokens: 1000, joined: '2024-04-10' },
+  { id: 6, name: 'Marco Bianchi', email: 'marco@tokeniq.it', country: 'IT', kyc: 'Approved', invested: 67000, purchasedTokens: 134000, airdropTokens: 7500, joined: '2024-01-25' },
+  { id: 7, name: 'Aisha Kamara', email: 'aisha@afrivest.ng', country: 'NG', kyc: 'Pending', invested: 12500, purchasedTokens: 25000, airdropTokens: 0, joined: '2024-04-15' },
+  { id: 8, name: 'Chen Wei', email: 'chen@cryptobase.cn', country: 'CN', kyc: 'Approved', invested: 110000, purchasedTokens: 220000, airdropTokens: 15000, joined: '2024-01-10' },
 ];
 
 export const kycItems = [
@@ -18,9 +18,9 @@ export const kycItems = [
 ];
 
 export const payments = [
-  { id: 'PAY-001', investor: 'Arjun Mehta', amount: 42500, method: 'Bank Transfer', date: '2024-04-01', status: 'Completed', ref: 'NEFT/234561' },
+  { id: 'PAY-001', investor: 'Arjun Mehta', amount: 42500, method: 'Bank Transfer', date: '2024-04-01', status: 'Completed', ref: 'NEFT/234561', actionBy: 'Alex Morgan', actionAt: '02 Apr 2024, 10:15' },
   { id: 'PAY-002', investor: 'Sofia Reyes', amount: 18000, method: 'USDT', date: '2024-04-02', status: 'Pending', ref: '0x8f3a...c9e2' },
-  { id: 'PAY-003', investor: "James O'Brien", amount: 95000, method: 'Wire Transfer', date: '2024-03-28', status: 'Completed', ref: 'SWIFT/88420' },
+  { id: 'PAY-003', investor: "James O'Brien", amount: 95000, method: 'Wire Transfer', date: '2024-03-28', status: 'Completed', ref: 'SWIFT/88420', actionBy: 'Sam Torres', actionAt: '29 Mar 2024, 09:40' },
   { id: 'PAY-004', investor: 'Aisha Kamara', amount: 12500, method: 'Bank Transfer', date: '2024-04-15', status: 'Pending', ref: 'NEFT/290012' },
   { id: 'PAY-005', investor: 'Chen Wei', amount: 110000, method: 'USDT', date: '2024-04-18', status: 'Pending', ref: '0x4d7b...f102' },
 ];
@@ -28,7 +28,7 @@ export const payments = [
 export const withdrawals = [
   { id: 'WD-001', investor: 'Arjun Mehta', amount: 5000, wallet: '0x8f3a...c9e2', requested: '2024-04-18', status: 'Pending' },
   { id: 'WD-002', investor: 'Marco Bianchi', amount: 12000, wallet: '0x1a2b...7df8', requested: '2024-04-17', status: 'Pending' },
-  { id: 'WD-003', investor: 'Chen Wei', amount: 20000, wallet: '0x9c4e...2b31', requested: '2024-04-16', status: 'Approved' },
+  { id: 'WD-003', investor: 'Chen Wei', amount: 20000, wallet: '0x9c4e...2b31', requested: '2024-04-16', status: 'Approved', actionBy: 'Alex Morgan', actionAt: '17 Apr 2024, 11:05' },
 ];
 
 export const referrals = [
@@ -61,8 +61,25 @@ export const affiliateLinks = [
 export const affiliatePayouts = [
   { id: 'PO-001', affiliate: 'Arjun Mehta', amount: 3100, method: 'Bank Transfer', wallet: 'HDFC/ARJUN', requested: '2024-04-20', status: 'Pending' },
   { id: 'PO-002', affiliate: "James O'Brien", amount: 7250, method: 'Wire Transfer', wallet: 'IBAN/IE29...', requested: '2024-04-19', status: 'Pending' },
-  { id: 'PO-003', affiliate: 'Chen Wei', amount: 840, method: 'USDT', wallet: '0x9c4e...2b31', requested: '2024-04-18', status: 'Approved' },
-  { id: 'PO-004', affiliate: 'Marco Bianchi', amount: 135, method: 'Bank Transfer', wallet: 'IT60...', requested: '2024-04-15', status: 'Approved' },
+  { id: 'PO-003', affiliate: 'Chen Wei', amount: 840, method: 'USDT', wallet: '0x9c4e...2b31', requested: '2024-04-18', status: 'Approved', actionBy: 'Sam Torres', actionAt: '19 Apr 2024, 14:22' },
+  { id: 'PO-004', affiliate: 'Marco Bianchi', amount: 135, method: 'Bank Transfer', wallet: 'IT60...', requested: '2024-04-15', status: 'Approved', actionBy: 'Alex Morgan', actionAt: '16 Apr 2024, 09:10' },
+];
+
+// ── Affiliate Programs ────────────────────────────────────────────
+export const affiliatePrograms = [
+  {
+    id: 'PROG-001',
+    name: 'ShivAI Launch Campaign',
+    tokenId: 'shivai', tokenName: 'ShivAI', ticker: 'SHVAI',
+    description: 'Global affiliate program for the ShivAI token launch — Q1/Q2 2024.',
+    status: 'Active',
+    affiliates: 4, totalRaised: 62000,
+    l1: 5, l2: 3, l3: 1.5,
+    startDate: '2024-03-01', endDate: '2024-12-31',
+    code: 'SHVAI-LAUNCH-X9K',
+    minInvest: 1000, maxAffiliates: '', cookieDays: 30, payoutThreshold: 100,
+    created: '2024-03-01',
+  },
 ];
 
 // ── Token Management ──────────────────────────────────────────────

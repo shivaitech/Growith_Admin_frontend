@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toggleSidebarCollapse, toggleSidebar, setTheme } from '../../store/slices/uiSlice';
-import { logout } from '../../store/slices/authSlice';
+import { useAuth } from '../../hooks/useAuth';
 import Icon from './Icon';
 import { notifications } from '../../data/mockData';
 
@@ -15,7 +15,7 @@ const routeLabels = {
   '/airdrop': 'Airdrop System',
   '/withdrawals': 'Withdrawal Management',
   '/affiliate': 'Affiliate Program',
-  '/affiliate/create-link': 'Create Referral Link',
+  '/affiliate/programs': 'Affiliate Programs',
   '/affiliate/affiliates': 'All Affiliates',
   '/affiliate/commissions': 'Commission Structure',
   '/affiliate/payouts': 'Commission Payouts',
@@ -30,7 +30,7 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useSelector((s) => s.ui);
-  const { user } = useSelector((s) => s.auth);
+  const { user, logout } = useAuth();
   const dark = theme === 'dark';
 
   const [notifOpen, setNotifOpen] = useState(false);
@@ -38,14 +38,14 @@ export default function Header() {
 
   const closeAll = () => { setNotifOpen(false); setProfileOpen(false); };
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await logout();
     navigate('/auth/login');
   };
 
   const initials = user?.name
     ? user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
-    : 'AM';
+    : user?.email?.[0]?.toUpperCase() || 'A';
 
   return (
     <header className="topbar" onClick={closeAll}>
@@ -117,18 +117,18 @@ export default function Header() {
           {profileOpen && (
             <div className="profile-panel animate-in" onClick={(e) => e.stopPropagation()}>
               <div className="profile-header">
-                <div className="profile-name">{user?.name ?? 'Alex Morgan'}</div>
-                <div className="profile-role">Master Admin · Growith</div>
+                <div className="profile-name">{user?.name || user?.email || 'Admin'}</div>
+                <div className="profile-role">{user?.role || 'Admin'}</div>
               </div>
               {[
-                { icon: 'user', label: 'Profile Settings' },
-                { icon: 'roles', label: 'Security & 2FA' },
-                { icon: 'settings', label: 'Preferences' },
+                { icon: 'user', label: 'Profile Settings', path: '/settings' },
+                { icon: 'roles', label: 'Sub Admins', path: '/settings?tab=sub-admins' },
+                { icon: 'settings', label: 'Platform Config', path: '/settings?tab=platform' },
               ].map((item) => (
                 <div
                   key={item.label}
                   className="profile-item"
-                  onClick={() => { navigate('/settings'); closeAll(); }}
+                  onClick={() => { navigate(item.path); closeAll(); }}
                 >
                   <Icon n={item.icon} size={14} />{item.label}
                 </div>

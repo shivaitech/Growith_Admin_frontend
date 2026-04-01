@@ -82,7 +82,18 @@ export default function Dashboard() {
                   <td><span className="chip" style={{ fontSize: 11, padding: '3px 8px' }}>{i.country}</span></td>
                   <td><Badge status={i.kyc} /></td>
                   <td style={{ fontFamily: 'DM Mono', fontWeight: 600, color: 'var(--emerald)' }}>${i.invested.toLocaleString()}</td>
-                  <td style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text2)' }}>{i.tokens.toLocaleString()}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--emerald)', background: 'rgba(16,185,129,0.1)', borderRadius: 4, padding: '1px 5px', letterSpacing: '0.3px' }}>PURCHASED</span>
+                        <span style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text)' }}>{i.purchasedTokens.toLocaleString()}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--amber, #f59e0b)', background: 'rgba(245,158,11,0.1)', borderRadius: 4, padding: '1px 5px', letterSpacing: '0.3px' }}>AIRDROP</span>
+                        <span style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text2)' }}>{i.airdropTokens.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </td>
                   <td className="td-muted">{i.joined}</td>
                 </tr>
               ))}
