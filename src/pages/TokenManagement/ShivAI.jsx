@@ -1,18 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/common/Icon';
 import Initials from '../../components/common/Initials';
+import adminService from '../../services/adminService';
 import { tokenInvestors, pendingMints, vestingSchedule, shivaiRaiseHistory } from '../../data/mockData';
 
-const TOKEN = {
-  name: 'ShivAI', ticker: 'SHVAI', blockchain: 'Polygon', standard: 'ERC-20',
-  contractAddress: '0x742d35Cc6634C0532925a3b8D4C9b8E2a1F2D1a5',
-  issuancePrice: 0.01, totalSupply: 10_000_000_000,
-  targetRaise: 5_000_000, totalRaised: 892_500,
-  holders: 47, tokensMinted: 89_250_000,
-  pendingMintCount: 2, launchDate: 'Jan 15, 2024',
-  lockPeriod: '12 months', accessType: 'OPEN',
-};
+const SHIVAI_ID = '69dcdd839e731266a8732e54';
 
 const ALLOCATION = [
   { label: 'Public Sale',          pct: 40, color: '#5C27FE' },
@@ -44,14 +37,43 @@ export default function ShivAI() {
   const [investorFilter, setInvFilter]  = useState('All');
   const [mintActions, setMintActions]   = useState({});
   const [copied, setCopied]             = useState(false);
-  const [settings, setSettings]         = useState({
-    name: 'ShivAI', ticker: 'SHVAI', supply: '10,000,000,000',
-    price: '0.01', blockchain: 'Polygon', standard: 'ERC-20',
-    minInvest: '500', maxInvest: '50000', lockPeriod: '12 months', access: 'OPEN',
+
+  // Real token data
+  const [token, setToken]         = useState(null);
+  const [tokenLoading, setTokenLoading] = useState(true);
+  const [tokenError, setTokenError]     = useState(null);
+
+  useEffect(() => {
+    adminService.getToken(SHIVAI_ID)
+      .then((res) => {
+        const t = res?.data?.token || res?.data?.data || res?.data || res;
+        setToken(t);
+      })
+      .catch((err) => setTokenError(err.message || 'Failed to load token'))
+      .finally(() => setTokenLoading(false));
+  }, []);
+
+  const [settings, setSettings] = useState({
+    name: '', ticker: '', supply: '', price: '', network: '', access: 'OPEN',
   });
 
-  const raisePct    = ((TOKEN.totalRaised / TOKEN.targetRaise) * 100).toFixed(2);
-  const maxRaise    = Math.max(...shivaiRaiseHistory.map((r) => r.raised));
+  // Populate settings once token loads
+  useEffect(() => {
+    if (token) {
+      setSettings({
+        name:    token.name    || '',
+        ticker:  token.symbol  || '',
+        supply:  String(token.totalSupply || ''),
+        price:   String(token.priceUsd    || ''),
+        network: token.network || '',
+        access:  'OPEN',
+      });
+    }
+  }, [token]);
+
+  const ticker   = token?.symbol || 'SHIV';
+  const network  = token?.network || '—';
+  const maxRaise = Math.max(...shivaiRaiseHistory.map((r) => r.raised));
 
   const filteredInvestors =
     investorFilter === 'All'     ? tokenInvestors :
@@ -64,7 +86,9 @@ export default function ShivAI() {
   const totalInvested   = tokenInvestors.reduce((s, i) => s + i.invested, 0);
 
   const copyAddress = () => {
-    navigator.clipboard.writeText(TOKEN.contractAddress).catch(() => {});
+    const addr = token?.contractAddress;
+    if (!addr) return;
+    navigator.clipboard.writeText(addr).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -84,6 +108,13 @@ export default function ShivAI() {
 
   return (
     <div className="animate-in">
+      {tokenLoading && (
+        <div className="card" style={{ padding: 32, textAlign: 'center', color: 'var(--text3)', marginBottom: 20 }}>Loading token data…</div>
+      )}
+      {tokenError && (
+        <div className="card" style={{ padding: 24, color: 'var(--crimson)', marginBottom: 20 }}>{tokenError}</div>
+      )}
+
       {/* ── HEADER ── */}
       <div className="page-header">
         <div>
@@ -91,39 +122,42 @@ export default function ShivAI() {
             <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg,#5C27FE,#DEC7FF)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>AI</div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span className="page-title" style={{ marginBottom: 0 }}>ShivAI</span>
-                <span style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text3)' }}>{TOKEN.ticker}</span>
-                <span className="badge badge-green">● LIVE</span>
-                {TOKEN.pendingMintCount > 0 && <span className="badge badge-amber">{TOKEN.pendingMintCount} Pending Mints</span>}
+                <span className="page-title" style={{ marginBottom: 0 }}>{token?.name || 'ShivAI Token'}</span>
+                <span style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text3)' }}>{ticker}</span>
+                <span className={`badge ${token?.isActive ? 'badge-green' : 'badge-gray'}`}>{token?.isActive ? '● LIVE' : '○ Inactive'}</span>
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text3)' }}>{TOKEN.blockchain} · {TOKEN.standard} · Launched {TOKEN.launchDate}</div>
+              <div style={{ fontSize: 12, color: 'var(--text3)', textTransform: 'capitalize' }}>{network} · Launched {token?.createdAt ? new Date(token.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text3)' }}>
-            <span>Contract:</span>
-            <span style={{ fontFamily: 'DM Mono' }}>{TOKEN.contractAddress}</span>
-            <button onClick={copyAddress} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#059669' : 'var(--text3)', padding: '0 2px' }} title="Copy address">
-              <Icon n={copied ? 'check' : 'copy'} size={12} />
-            </button>
-            {copied && <span style={{ color: '#059669', fontSize: 11 }}>Copied!</span>}
-          </div>
+          {token?.contractAddress ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text3)' }}>
+              <span>Contract:</span>
+              <span style={{ fontFamily: 'DM Mono' }}>{token.contractAddress}</span>
+              <button onClick={copyAddress} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#059669' : 'var(--text3)', padding: '0 2px' }} title="Copy address">
+                <Icon n={copied ? 'check' : 'copy'} size={12} />
+              </button>
+              {copied && <span style={{ color: '#059669', fontSize: 11 }}>Copied!</span>}
+            </div>
+          ) : (
+            <div style={{ fontSize: 11, color: 'var(--text3)' }}>Contract: Not deployed</div>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <Link to="/token" style={{ textDecoration: 'none' }} className="btn">← All Tokens</Link>
           <button className="btn btn-primary" onClick={() => setTab('Mint Queue')}>
-            <Icon n="token" size={13} /> Mint Queue ({TOKEN.pendingMintCount})
+            <Icon n="token" size={13} /> Mint Queue
           </button>
         </div>
       </div>
 
       {/* ── TABS ── */}
-      <div className="card" style={{ padding: 0, marginBottom: 20 }}>
-        <div className="tabs" style={{ padding: '0 16px' }}>
+      <div className="card" style={{ padding: 0, marginBottom: 20, overflowX: 'auto' }}>
+        <div className="tabs" style={{ padding: '0 16px', flexWrap: 'nowrap', width: 'max-content', minWidth: '100%' }}>
           {TABS.map((t) => (
             <div key={t} className={`tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
               {t}
-              {t === 'Mint Queue' && TOKEN.pendingMintCount > 0 && (
-                <span className="nav-badge">{TOKEN.pendingMintCount}</span>
+              {t === 'Mint Queue' && pendingMints.length > 0 && (
+                <span className="nav-badge">{pendingMints.length}</span>
               )}
             </div>
           ))}
@@ -136,38 +170,35 @@ export default function ShivAI() {
       {tab === 'Overview' && (
         <>
           {/* 6 KPI cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 18 }}>
+          <div className="grid-3" style={{ marginBottom: 18 }}>
             {[
-              { label: 'Total Raised',     value: `$${(TOKEN.totalRaised / 1000).toFixed(1)}K`,              sub: `of $${(TOKEN.targetRaise / 1_000_000).toFixed(0)}M target`,    icon: 'coins',     color: '#059669', up: true  },
-              { label: 'Active Investors', value: TOKEN.holders,                                              sub: '+19 this month',                                               icon: 'users',     color: '#1a56db', up: true  },
-              { label: 'Tokens Minted',   value: `${(TOKEN.tokensMinted / 1_000_000).toFixed(2)}M`,          sub: `of ${(TOKEN.totalSupply / 1_000_000_000).toFixed(0)}B supply`, icon: 'token',     color: '#5C27FE', up: null  },
-              { label: 'Issuance Price',  value: `$${TOKEN.issuancePrice}`,                                  sub: 'Fixed · non-tradable',                                        icon: 'payment',   color: '#6366f1', up: null  },
-              { label: 'Market Cap',      value: `$${(TOKEN.totalSupply * TOKEN.issuancePrice / 1_000_000).toFixed(0)}M`, sub: 'At fixed issuance price',                        icon: 'affiliate', color: '#7c3aed', up: null  },
-              { label: 'Raise Progress',  value: `${raisePct}%`,                                             sub: `${(100 - parseFloat(raisePct)).toFixed(1)}% remaining`,        icon: 'airdrop',   color: '#d97806', up: true  },
+              { label: 'Price (USD)',      value: token?.priceUsd != null ? `$${token.priceUsd}` : '—',                  sub: 'Per token',                                                        icon: 'coins',     color: '#059669', up: null },
+              { label: 'Total Supply',    value: Number(token?.totalSupply || 0).toLocaleString(),                            sub: `${ticker} total`,                                                  icon: 'token',     color: '#5C27FE', up: null },
+              { label: 'Available',       value: Number(token?.availableSupply || 0).toLocaleString(),                        sub: 'Available tokens',                                                 icon: 'airdrop',   color: '#d97806', up: null },
+              { label: 'Network',         value: token?.network ? token.network.charAt(0).toUpperCase() + token.network.slice(1) : '—', sub: 'Blockchain',                                        icon: 'payment',   color: '#6366f1', up: null },
+              { label: 'Status',          value: token?.isActive ? 'Active' : 'Inactive',                                    sub: token?.isActive ? 'Token is live' : 'Token inactive',              icon: 'shield',    color: token?.isActive ? '#059669' : '#6b7280', up: null },
+              { label: 'Supply Used',     value: token?.totalSupply > 0 ? `${(((token.totalSupply - (token.availableSupply || 0)) / token.totalSupply) * 100).toFixed(1)}%` : '—', sub: 'Of total supply allocated', icon: 'affiliate', color: '#7c3aed', up: null },
             ].map((s) => (
               <div className="stat-card" key={s.label}>
                 <div className="stat-icon" style={{ background: s.color + '18', color: s.color }}><Icon n={s.icon} size={17} /></div>
                 <div className="stat-label">{s.label}</div>
                 <div className="stat-value">{s.value}</div>
-                <div className={`stat-delta ${s.up === true ? 'delta-up' : s.up === false ? 'delta-down' : ''}`} style={{ color: s.up === null ? 'var(--text3)' : undefined }}>{s.sub}</div>
+                <div className="stat-delta" style={{ color: 'var(--text3)' }}>{s.sub}</div>
               </div>
             ))}
           </div>
 
-          {/* Raise progress (prominent bar) */}
+          {/* Token info card */}
           <div className="card" style={{ marginBottom: 18 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <div className="section-title" style={{ marginBottom: 0 }}>Capital Raise Progress</div>
-              <span style={{ fontFamily: 'DM Mono', fontWeight: 700, fontSize: 14, color: 'var(--accent)' }}>
-                ${TOKEN.totalRaised.toLocaleString()} / $5,000,000
-              </span>
+              <div className="section-title" style={{ marginBottom: 0 }}>Token Info</div>
             </div>
-            <div className="progress-bar" style={{ height: 12, borderRadius: 8 }}>
-              <div className="progress-fill" style={{ width: `${raisePct}%`, borderRadius: 8 }} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text3)', marginTop: 6 }}>
-              <span>Public Sale allocation: 40% of total supply (4,000,000,000 SHVAI)</span>
-              <span>{raisePct}% of raise target achieved</span>
+            <div className="kv">
+              <div className="kv-item"><div className="kv-label">Token ID</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{token?.id || token?._id || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Description</div><div className="kv-value">{token?.description || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Contract</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{token?.contractAddress || 'Not deployed'}</div></div>
+              <div className="kv-item"><div className="kv-label">Created</div><div className="kv-value">{token?.createdAt ? new Date(token.createdAt).toLocaleString() : '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Updated</div><div className="kv-value">{token?.updatedAt ? new Date(token.updatedAt).toLocaleString() : '—'}</div></div>
             </div>
           </div>
 
@@ -203,7 +234,7 @@ export default function ShivAI() {
                         <span style={{ color: 'var(--text2)', fontWeight: 500 }}>{a.label}</span>
                       </div>
                       <span style={{ fontFamily: 'DM Mono', fontWeight: 600 }}>
-                        {a.pct}% <span style={{ color: 'var(--text3)', fontWeight: 400 }}>({(TOKEN.totalSupply * a.pct / 100 / 1_000_000_000).toFixed(0)}B)</span>
+                        {a.pct}% <span style={{ color: 'var(--text3)', fontWeight: 400 }}>({((token?.totalSupply || 0) * a.pct / 100).toLocaleString()})</span>
                       </span>
                     </div>
                     <div className="progress-bar" style={{ height: 7 }}>
@@ -425,7 +456,7 @@ export default function ShivAI() {
       {tab === 'Vesting' && (
         <>
           {/* Summary stats */}
-          <div className="grid-4" style={{ gridTemplateColumns: 'repeat(4,1fr)', marginBottom: 18 }}>
+          <div className="grid-4" style={{ marginBottom: 18 }}>
             {[
               { label: 'Vesting Released',  value: `${vestingReleased}%`,   sub: `${vestingSchedule.filter((v) => v.status === 'Released' && v.pct > 0).reduce((s, v) => s + v.tokens, 0).toLocaleString()} SHVAI`, color: '#059669' },
               { label: 'Remaining Unlock',  value: `${100 - vestingReleased}%`, sub: 'Across future milestones',       color: '#d97806' },
@@ -502,48 +533,24 @@ export default function ShivAI() {
           <div className="card">
             <div className="section-title" style={{ marginBottom: 16 }}>Token Configuration</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(230px,1fr))', gap: 16 }}>
-              {settingField('Token Name',      'name')}
-              {settingField('Ticker Symbol',   'ticker')}
-              {settingField('Total Supply',    'supply', true)}
-              {settingField('Issuance Price ($)', 'price')}
-              {settingField('Blockchain',      'blockchain', true)}
-              {settingField('Token Standard',  'standard', true)}
+              {[['Token Name', 'name'], ['Symbol', 'ticker'], ['Total Supply', 'supply', true], ['Price (USD)', 'price'], ['Network', 'network', true]].map(([label, key, readOnly]) => (
+                <div key={label}>
+                  <label style={{ fontSize: 12, color: 'var(--text3)', display: 'block', marginBottom: 4 }}>{label}</label>
+                  <input
+                    type="text"
+                    value={settings[key] || ''}
+                    readOnly={!!readOnly}
+                    onChange={(e) => !readOnly && setSettings((p) => ({ ...p, [key]: e.target.value }))}
+                    style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: readOnly ? 'var(--text3)' : 'var(--text)', fontSize: 13, fontFamily: key === 'price' || key === 'supply' ? 'DM Mono' : 'inherit', boxSizing: 'border-box' }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Investment Rules */}
           <div className="card">
-            <div className="section-title" style={{ marginBottom: 16 }}>Investment Rules</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 16 }}>
-              {settingField('Minimum Investment ($)', 'minInvest')}
-              {settingField('Maximum Investment ($)', 'maxInvest')}
-              {settingField('Lock-in Period',         'lockPeriod')}
-              {settingField('Access Type',            'access')}
-            </div>
-          </div>
-
-          {/* Smart Contract */}
-          <div className="card">
-            <div className="section-title" style={{ marginBottom: 16 }}>Smart Contract</div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, color: 'var(--text3)', display: 'block', marginBottom: 4 }}>Contract Address (Polygon Mainnet)</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input
-                  value={TOKEN.contractAddress} readOnly
-                  style={{ flex: 1, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--text3)', fontSize: 13, fontFamily: 'DM Mono' }}
-                />
-                <button className="btn" onClick={copyAddress}>{copied ? 'Copied!' : 'Copy'}</button>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <a href="#" className="btn" style={{ textDecoration: 'none', fontSize: 12 }}>View on PolygonScan</a>
-              <a href="#" className="btn" style={{ textDecoration: 'none', fontSize: 12 }}>Audit Report</a>
-            </div>
-          </div>
-
-          {/* Offering Status */}
-          <div className="card">
-            <div className="section-title" style={{ marginBottom: 12 }}>Offering Status</div>
+            <div className="section-title" style={{ marginBottom: 16 }}>Offering Status</div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
               {['OPEN', 'INVITE_ONLY', 'CLOSED'].map((s) => (
                 <button

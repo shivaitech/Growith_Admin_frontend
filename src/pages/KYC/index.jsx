@@ -1,75 +1,106 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import Initials from '../../components/common/Initials';
-import KYCModal from '../../components/common/KYCModal';
-import { kycItems as initialKYC } from '../../data/mockData';
+import adminService from '../../services/adminService';
 
-const tabs = ['Pending', 'Approved', 'Rejected', 'Manual Review'];
+const tabs = ['Pending', 'Approved', 'Rejected'];
 
-const fmtNow = () => {
-  const d = new Date();
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const normalizeStatus = (s) => {
+  if (!s) return 'Pending';
+  const lower = s.toLowerCase();
+  if (lower === 'approved') return 'Approved';
+  if (lower === 'rejected') return 'Rejected';
+  if (lower === 'manual_review' || lower === 'manual review') return 'Manual Review';
+  if (lower === 'pending_approval' || lower === 'pending') return 'Pending';
+  return 'Pending';
 };
 
 export default function KYC() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState('Pending');
-  const [modal, setModal] = useState(null);
-  const [items, setItems] = useState(initialKYC);
-  const currentUser = useSelector((s) => s.auth.user?.name || 'Admin');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const filtered = items.filter((i) => i.status === tab);
+  const fetchKyc = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await adminService.getKycRequests();
+      const list = res?.data?.requests || res?.data?.data || res?.data?.submissions || res?.data || res || [];
+      setItems(Array.isArray(list) ? list : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const handleAction = (id, action) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, status: action, actionBy: currentUser, actionAt: fmtNow() } : i)));
-    setModal(null);
-  };
+  useEffect(() => { fetchKyc(); }, [fetchKyc]);
+
+  // Normalize fields from real API
+  const getStatus = (k) => normalizeStatus(k.status || k.kycStatus);
+  const getName = (k) => k.fullLegalName || k.user?.fullName || k.fullName || '—';
+  const getEmail = (k) => k.user?.email || k.email || '';
+
+  const filtered = items.filter((i) => getStatus(i) === tab);
+
+  // Count per tab
+  const counts = {};
+  tabs.forEach((t) => { counts[t] = items.filter((i) => getStatus(i) === t).length; });
 
   return (
     <div className="animate-in">
-      {modal && <KYCModal item={modal} onClose={() => setModal(null)} onAction={handleAction} />}
-
       <div className="page-header">
         <div>
           <div className="page-title">KYC Management</div>
-          <div className="page-sub">Review and verify investor identity documents</div>
+          <div className="page-sub">{items.length} total submission{items.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
-        {tabs.map((t) => {
-          const count = items.filter((i) => i.status === t).length;
-          return (
-            <div
-              key={t}
-              onClick={() => setTab(t)}
-              style={{
-                background: tab === t ? 'var(--accent)' : 'var(--surface)',
-                color: tab === t ? '#fff' : 'var(--text2)',
-                border: '1px solid',
-                borderColor: tab === t ? 'var(--accent)' : 'var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: '8px 18px',
-                cursor: 'pointer',
-                fontSize: 13,
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                transition: 'all 0.15s',
-              }}
-            >
-              {t}
-              <span style={{ background: tab === t ? 'rgba(255,255,255,0.2)' : 'var(--surface2)', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>
-                {count}
-              </span>
-            </div>
-          );
-        })}
+        {tabs.map((t) => (
+          <div
+            key={t}
+            onClick={() => setTab(t)}
+            style={{
+              background: tab === t ? 'var(--accent)' : 'var(--surface)',
+              color: tab === t ? '#fff' : 'var(--text2)',
+              border: '1px solid',
+              borderColor: tab === t ? 'var(--accent)' : 'var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '8px 18px',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all 0.15s',
+            }}
+          >
+            {t}
+            <span style={{ background: tab === t ? 'rgba(255,255,255,0.2)' : 'var(--surface2)', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>
+              {counts[t]}
+            </span>
+          </div>
+        ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {error && (
+        <div style={{ padding: '12px 16px', marginBottom: 14, borderRadius: 'var(--radius)', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: 13 }}>
+          {error}
+          <button style={{ marginLeft: 12, background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 12, fontWeight: 600 }} onClick={fetchKyc}>Retry</button>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="card">
+          <div className="empty-state"><div className="empty-title">Loading KYC submissions…</div></div>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="card">
           <div className="empty-state">
             <div className="empty-icon">✅</div>
@@ -83,48 +114,42 @@ export default function KYC() {
             <table>
               <thead>
                 <tr>
-                  <th>Applicant</th><th>Country</th><th>Document Type</th>
+                  <th>Applicant</th><th>Document Type</th>
                   <th>Submitted</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((k) => (
-                  <tr key={k.id}>
+                  <tr key={k.id || k._id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <Initials name={k.name} gradient="linear-gradient(135deg,#1a56db,#0ea5e9)" />
+                        <Initials name={getName(k)} gradient="linear-gradient(135deg,#1a56db,#0ea5e9)" />
                         <div>
-                          <div style={{ fontWeight: 500 }}>{k.name}</div>
-                          <div className="td-muted">{k.email}</div>
+                          <div style={{ fontWeight: 500 }}>{getName(k)}</div>
+                          <div className="td-muted">{getEmail(k)}</div>
                         </div>
                       </div>
                     </td>
-                    <td><span className="chip" style={{ fontSize: 11, padding: '3px 8px' }}>{k.country}</span></td>
-                    <td className="td-muted">{k.docType}</td>
-                    <td className="td-muted">{k.submitted}</td>
+                    <td className="td-muted">
+                          {k.panNumber ? 'PAN' : k.aadhaarNumber ? 'Aadhaar' : '—'}
+                          {(k.panNumber || k.aadhaarNumber) && (
+                            <div style={{ fontSize: 11, fontFamily: 'DM Mono', color: 'var(--text3)' }}>{k.panNumber || k.aadhaarNumber}</div>
+                          )}
+                        </td>
+                    <td className="td-muted">{(k.submittedAt || k.createdAt) ? new Date(k.submittedAt || k.createdAt).toLocaleDateString() : '—'}</td>
                     <td>
-                      <Badge status={k.status} />
-                      {k.actionBy && (
+                      <Badge status={getStatus(k)} />
+                      {k.reviewedBy && (
                         <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4, whiteSpace: 'nowrap' }}>
-                          By {k.actionBy} · {k.actionAt}
+                          By {k.reviewedBy}
                         </div>
                       )}
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <button className="btn btn-ghost btn-sm" onClick={() => setModal(k)}>
+                        <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/kyc/${k.id || k._id}`)}>
                           <Icon n="eye" size={12} />Review
                         </button>
-                        {k.status === 'Pending' && (
-                          <>
-                            <button className="btn btn-success btn-sm" onClick={() => handleAction(k.id, 'Approved')}>
-                              <Icon n="check" size={12} />
-                            </button>
-                            <button className="btn btn-danger btn-sm" onClick={() => handleAction(k.id, 'Rejected')}>
-                              <Icon n="x" size={12} />
-                            </button>
-                          </>
-                        )}
                       </div>
                     </td>
                   </tr>

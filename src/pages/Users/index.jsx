@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/common/Icon';
 import Badge from '../../components/common/Badge';
 import Initials from '../../components/common/Initials';
@@ -6,6 +7,7 @@ import Modal from '../../components/common/Modal';
 import adminService from '../../services/adminService';
 
 export default function Investors() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,6 +17,10 @@ export default function Investors() {
   // Single user detail
   const [selectedUser, setSelectedUser] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+
+  // KYC detail for selected user
+  const [userKyc, setUserKyc] = useState(null);
+  const [kycLoading, setKycLoading] = useState(false);
 
   // Create / Edit modal
   const [showForm, setShowForm] = useState(false);
@@ -51,6 +57,7 @@ export default function Investors() {
   // ── View single user ────────────────────────────────────────────────────
   const viewUser = async (userId) => {
     setDetailLoading(true);
+    setUserKyc(null);
     try {
       const res = await adminService.getUser(userId);
       setSelectedUser(res?.data?.user || res?.data || res?.user || res);
@@ -58,6 +65,19 @@ export default function Investors() {
       setError(err.message);
     } finally {
       setDetailLoading(false);
+    }
+    // Also try to fetch KYC submissions — user may not have one
+    setKycLoading(true);
+    try {
+      const kycRes = await adminService.getKycRequests();
+      const allKyc = kycRes?.data?.requests || kycRes?.data?.submissions || kycRes?.data || kycRes?.submissions || [];
+      const list = Array.isArray(allKyc) ? allKyc : [];
+      const match = list.find((k) => k.userId === userId || k.user?.id === userId);
+      setUserKyc(match || null);
+    } catch {
+      // KYC data is optional — don't block the view
+    } finally {
+      setKycLoading(false);
     }
   };
 
@@ -239,6 +259,48 @@ export default function Investors() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* KYC Information */}
+        <div className="card" style={{ marginTop: 16 }}>
+          <div className="section-title">KYC Information</div>
+          {kycLoading ? (
+            <div style={{ fontSize: 13, color: 'var(--text3)', padding: '12px 0' }}>Loading KYC data…</div>
+          ) : userKyc ? (
+            <>
+              <div className="info-row">
+                <span className="info-label">KYC Status</span>
+                <Badge status={(userKyc.status || 'PENDING').charAt(0).toUpperCase() + (userKyc.status || 'PENDING').slice(1).toLowerCase()} />
+              </div>
+              {userKyc.fullLegalName && (
+                <div className="info-row">
+                  <span className="info-label">Full Legal Name</span>
+                  <span style={{ fontWeight: 500, fontSize: 13 }}>{userKyc.fullLegalName}</span>
+                </div>
+              )}
+              {userKyc.panNumber && (
+                <div className="info-row">
+                  <span className="info-label">PAN Number</span>
+                  <span style={{ fontFamily: 'DM Mono', fontWeight: 500, fontSize: 12, color: 'var(--text2)' }}>{userKyc.panNumber}</span>
+                </div>
+              )}
+              {userKyc.aadhaarNumber && (
+                <div className="info-row">
+                  <span className="info-label">Aadhaar Number</span>
+                  <span style={{ fontFamily: 'DM Mono', fontWeight: 500, fontSize: 12, color: 'var(--text2)' }}>{userKyc.aadhaarNumber}</span>
+                </div>
+              )}
+              <div style={{ marginTop: 12 }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/kyc/${userKyc.id || userKyc._id}`)}>
+                  <Icon n="eye" size={12} />View Full KYC Details
+                </button>
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 13, color: 'var(--text3)', padding: '12px 0' }}>
+              No KYC submission found for this investor.
+            </div>
+          )}
         </div>
 
         {/* Delete confirmation */}

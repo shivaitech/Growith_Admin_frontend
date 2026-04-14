@@ -150,3 +150,14 @@ export const vestingSchedule = [
   { milestone: 'Month 18', date: 'Oct 2025', releaseType: 'Partial',    pct: 20, tokens: 17850000, status: 'Upcoming', note: null },
   { milestone: 'Month 24', date: 'Apr 2026', releaseType: 'Final',      pct: 20, tokens: 17850000, status: 'Upcoming', note: 'Full unlock at 24 months' },
 ];
+
+// ── Token Purchase Requests ───────────────────────────────────────
+export const tokenRequests = [
+  { id: 'TR-001', investor: 'Chen Wei',      email: 'chen@cryptobase.cn',  country: 'CN', kyc: 'Approved',       token: 'ShivAI', ticker: 'SHVAI', amount: 110000, tokensRequested: 11000000, method: 'USDT (TRC20)',  paymentRef: '0x4d7b...f102', walletAddress: '0x9c4e...2b31', requestedAt: '2024-04-18', status: 'Pending' },
+  { id: 'TR-002', investor: 'Aisha Kamara',  email: 'aisha@afrivest.ng',   country: 'NG', kyc: 'Approved',       token: 'ShivAI', ticker: 'SHVAI', amount: 12500,  tokensRequested: 1250000,  method: 'Bank Transfer', paymentRef: 'NEFT/290012',   walletAddress: 'Pending',       requestedAt: '2024-04-15', status: 'Pending' },
+  { id: 'TR-003', investor: "James O'Brien", email: 'james@capvault.ie',   country: 'IE', kyc: 'Approved',       token: 'ShivAI', ticker: 'SHVAI', amount: 95000,  tokensRequested: 9500000,  method: 'Wire Transfer', paymentRef: 'SWIFT/88420',   walletAddress: '0x7ab1...d221', requestedAt: '2024-03-28', status: 'Approved', actionBy: 'Alex Morgan', actionAt: '2024-03-29' },
+  { id: 'TR-004', investor: 'Arjun Mehta',   email: 'arjun@techwave.io',   country: 'IN', kyc: 'Approved',       token: 'ShivAI', ticker: 'SHVAI', amount: 42500,  tokensRequested: 4250000,  method: 'Bank Transfer', paymentRef: 'NEFT/234561',   walletAddress: '0x3fe2...a910', requestedAt: '2024-03-12', status: 'Approved', actionBy: 'Sam Torres',  actionAt: '2024-03-13' },
+  { id: 'TR-005', investor: 'Yuki Tanaka',   email: 'yuki@blockfin.jp',    country: 'JP', kyc: 'Manual Review',  token: 'ShivAI', ticker: 'SHVAI', amount: 28000,  tokensRequested: 2800000,  method: 'Wire Transfer', paymentRef: 'SWIFT/JP3309',  walletAddress: '0x1cf4...b003', requestedAt: '2024-03-29', status: 'Pending' },
+  { id: 'TR-006', investor: 'Sofia Reyes',   email: 'sofia@nexgen.co',     country: 'MX', kyc: 'Pending',        token: 'ShivAI', ticker: 'SHVAI', amount: 18000,  tokensRequested: 1800000,  method: 'USDT',          paymentRef: '0x8f3a...c9e2', walletAddress: '0x5da9...ef01', requestedAt: '2024-04-02', status: 'Rejected', actionBy: 'Alex Morgan', actionAt: '2024-04-03' },
+  { id: 'TR-007', investor: 'Marco Bianchi', email: 'marco@tokeniq.it',    country: 'IT', kyc: 'Approved',       token: 'ShivAI', ticker: 'SHVAI', amount: 67000,  tokensRequested: 6700000,  method: 'Wire Transfer', paymentRef: 'SWIFT/ITL002',  walletAddress: '0x1a2b...7df8', requestedAt: '2024-01-25', status: 'Approved', actionBy: 'Sam Torres',  actionAt: '2024-01-26' },
+];

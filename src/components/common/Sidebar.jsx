@@ -6,18 +6,18 @@ import Icon from './Icon';
 const navMain = [
   { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/investors', label: 'Investors', icon: 'users' },
-  { to: '/kyc', label: 'KYC Management', icon: 'kyc', badge: 3 },
-  { to: '/payments', label: 'Payments', icon: 'payment', badge: 3 },
+  { to: '/kyc', label: 'KYC Management', icon: 'kyc' },
+  { to: '/payments', label: 'Token Requests', icon: 'payment' },
 ];
 
 const navToken = [
   { to: '/token', label: 'Marketplace', icon: 'token', end: true },
-  { to: '/token/shivai', label: 'ShivAI ● LIVE', icon: 'token', badge: 2 },
+  { to: '/token/shivai', label: 'ShivAI ● LIVE', icon: 'token' },
 ];
 
 const navFinance = [
   { to: '/airdrop', label: 'Airdrops', icon: 'airdrop' },
-  { to: '/withdrawals', label: 'Withdrawals', icon: 'withdraw', badge: 2 },
+  { to: '/withdrawals', label: 'Withdrawals', icon: 'withdraw' },
 ];
 
 const navAffiliate = [
@@ -25,7 +25,7 @@ const navAffiliate = [
   { to: '/affiliate/programs', label: 'Programs', icon: 'link' },
   { to: '/affiliate/affiliates', label: 'All Affiliates', icon: 'users' },
   { to: '/affiliate/commissions', label: 'Commissions', icon: 'percent' },
-  { to: '/affiliate/payouts', label: 'Payouts', icon: 'payout', badge: 2 },
+  { to: '/affiliate/payouts', label: 'Payouts', icon: 'payout' },
 ];
 
 const navAdmin = [

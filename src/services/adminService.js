@@ -43,20 +43,25 @@ class AdminService {
   // ════════════════════════════════════════════════
   // KYC
   // ════════════════════════════════════════════════
+  // GET    /admin/kyc-requests          — List KYC submissions
+  // GET    /admin/kyc-requests/:id      — Get KYC + user detail
+  // PATCH  /admin/kyc-requests/:id/approve — Approve KYC
+  // PATCH  /admin/kyc-requests/:id/reject  — Reject KYC (body: { reason })
+  // ════════════════════════════════════════════════
   getKycRequests(params) {
-    return apiService.get('/admin/kyc', params);
+    return apiService.get('/admin/kyc-requests', params);
   }
 
   getKycRequest(kycId) {
-    return apiService.get(`/admin/kyc/${kycId}`);
+    return apiService.get(`/admin/kyc-requests/${kycId}`);
   }
 
   approveKyc(kycId) {
-    return apiService.post(`/admin/kyc/${kycId}/approve`);
+    return apiService.patch(`/admin/kyc-requests/${kycId}/approve`);
   }
 
   rejectKyc(kycId, reason) {
-    return apiService.post(`/admin/kyc/${kycId}/reject`, { reason });
+    return apiService.patch(`/admin/kyc-requests/${kycId}/reject`, { rejectionReason: reason });
   }
 
   /** POST /admin/kyc/send-link  — send KYC verification link to a user's email */
@@ -84,22 +89,21 @@ class AdminService {
   }
 
   // ════════════════════════════════════════════════
-  // WITHDRAWALS
+  // WALLET / WITHDRAWAL REQUESTS
+  // GET   /admin/wallet/requests
+  // GET   /admin/wallet/requests/:id
+  // PATCH /admin/wallet/requests/:id/review
   // ════════════════════════════════════════════════
-  getWithdrawals(params) {
-    return apiService.get('/admin/withdrawals', params);
+  getWalletRequests(params) {
+    return apiService.get('/admin/wallet/requests', params);
   }
 
-  getWithdrawal(id) {
-    return apiService.get(`/admin/withdrawals/${id}`);
+  getWalletRequest(id) {
+    return apiService.get(`/admin/wallet/requests/${id}`);
   }
 
-  approveWithdrawal(id) {
-    return apiService.post(`/admin/withdrawals/${id}/approve`);
-  }
-
-  rejectWithdrawal(id, reason) {
-    return apiService.post(`/admin/withdrawals/${id}/reject`, { reason });
+  reviewWalletRequest(id, data) {
+    return apiService.patch(`/admin/wallet/requests/${id}/review`, data);
   }
 
   // ════════════════════════════════════════════════
@@ -140,6 +144,78 @@ class AdminService {
 
   deleteTokenAllocation(id) {
     return apiService.delete(`/admin/token-allocations/${id}`);
+  }
+
+  // ════════════════════════════════════════════════
+  // TOKEN REQUESTS  (investor purchase requests)
+  // GET    /admin/token-requests[?status=pending|approved|rejected]
+  // GET    /admin/token-requests/:id
+  // POST   /admin/token-requests          (admin-initiated)
+  // POST   /admin/token-requests/:id/airdrop-otp/send
+  // POST   /admin/token-requests/:id/airdrop-otp/verify
+  // PATCH  /admin/token-requests/:id/approve
+  // PATCH  /admin/token-requests/:id/reject
+  // GET    /admin/token-requests/:id/audit-logs
+  // ════════════════════════════════════════════════
+  getTokenRequests(params) {
+    return apiService.get('/admin/token-requests', params);
+  }
+
+  getTokenRequest(id) {
+    return apiService.get(`/admin/token-requests/${id}`);
+  }
+
+  /** POST /admin/token-requests — admin creates a token request on behalf of investor */
+  createTokenRequest(data) {
+    return apiService.post('/admin/token-requests', data);
+  }
+
+  /** POST /admin/token-requests/:id/airdrop-otp/send — trigger OTP email to admin */
+  sendAirdropOtp(id) {
+    return apiService.post(`/admin/token-requests/${id}/airdrop-otp/send`);
+  }
+
+  /** POST /admin/token-requests/:id/airdrop-otp/verify — body: { otp } */
+  verifyAirdropOtp(id, otp) {
+    return apiService.post(`/admin/token-requests/${id}/airdrop-otp/verify`, { code: otp });
+  }
+
+  /** PATCH /admin/token-requests/:id/approve — body: { adminNote?, airdropReference? } */
+  approveTokenRequest(id, data = {}) {
+    return apiService.patch(`/admin/token-requests/${id}/approve`, data);
+  }
+
+  /** PATCH /admin/token-requests/:id/reject — body: { rejectionReason (required), adminNote? } */
+  rejectTokenRequest(id, rejectionReason, adminNote = '') {
+    const body = { rejectionReason };
+    if (adminNote) body.adminNote = adminNote;
+    return apiService.patch(`/admin/token-requests/${id}/reject`, body);
+  }
+
+  /** GET /admin/token-requests/:id/audit-logs */
+  getTokenRequestAuditLogs(id) {
+    return apiService.get(`/admin/token-requests/${id}/audit-logs`);
+  }
+
+  // ════════════════════════════════════════════════
+  // DIRECT AIRDROPS
+  // POST /admin/direct-airdrops/otp/send
+  // POST /admin/direct-airdrops/otp/verify
+  // ════════════════════════════════════════════════
+  sendDirectAirdropOtp(data) {
+    return apiService.post('/admin/direct-airdrops/otp/send', data);
+  }
+
+  verifyDirectAirdropOtp(directAirdropId, code) {
+    return apiService.post('/admin/direct-airdrops/otp/verify', { directAirdropId, code });
+  }
+
+  getDirectAirdrops(params) {
+    return apiService.get('/admin/direct-airdrops', params);
+  }
+
+  getDirectAirdrop(id) {
+    return apiService.get(`/admin/direct-airdrops/${id}`);
   }
 
   // ════════════════════════════════════════════════

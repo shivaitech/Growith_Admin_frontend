@@ -51,7 +51,7 @@ export default function ResetPassword() {
   // Success state
   if (success) {
     return (
-      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 36, textAlign: 'center' }}>
+      <div className="auth-box" style={{ textAlign: 'center' }}>
         <div style={{
           width: 56, height: 56, borderRadius: '50%',
           background: 'rgba(34,197,94,0.1)', border: '2px solid rgba(34,197,94,0.3)',
@@ -107,7 +107,7 @@ export default function ResetPassword() {
   })();
 
   return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 36 }}>
+    <div className="auth-box">
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
         <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg,var(--accent),var(--accent2))', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>
           G

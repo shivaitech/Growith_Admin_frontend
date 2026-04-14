@@ -5,6 +5,11 @@ import apiService from './apiService';
  * Matches backend routes mounted at /api/v1/admin/auth
  */
 class AuthService {
+  /** POST /admin/auth/register */
+  async register(data) {
+    return apiService.post('/admin/auth/register', data);
+  }
+
   /** POST /admin/auth/login */
   async login(credentials) {
     return apiService.post('/admin/auth/login', credentials);

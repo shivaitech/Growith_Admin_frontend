@@ -7,6 +7,7 @@ import ProtectedRoute from '../components/common/ProtectedRoute';
 import Dashboard from '../pages/Dashboard';
 import Investors from '../pages/Users';
 import KYC from '../pages/KYC';
+import KYCDetail from '../pages/KYC/KYCDetail';
 import Payments from '../pages/Payments';
 import TokenManagement from '../pages/TokenManagement';
 import ShivAI from '../pages/TokenManagement/ShivAI';
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: 'investors', element: <Investors /> },
       { path: 'kyc', element: <KYC /> },
+      { path: 'kyc/:id', element: <KYCDetail /> },
       { path: 'payments', element: <Payments /> },
       { path: 'token', element: <TokenManagement /> },
       { path: 'token/shivai', element: <ShivAI /> },
