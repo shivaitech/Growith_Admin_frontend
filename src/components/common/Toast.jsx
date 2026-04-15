@@ -31,10 +31,10 @@ const ICONS = {
 };
 
 const COLORS = {
-  success: { bg: 'rgba(5,150,105,0.10)', border: 'rgba(5,150,105,0.3)', color: '#059669' },
-  error:   { bg: 'rgba(220,38,38,0.10)',  border: 'rgba(220,38,38,0.3)',  color: '#dc2626' },
-  warning: { bg: 'rgba(217,119,6,0.10)',  border: 'rgba(217,119,6,0.3)',  color: '#d97706' },
-  info:    { bg: 'rgba(26,86,219,0.10)',  border: 'rgba(26,86,219,0.3)',  color: '#1a56db' },
+  success: { border: '#059669', color: '#34d399', leftBar: '#059669' },
+  error:   { border: '#dc2626', color: '#f87171', leftBar: '#dc2626' },
+  warning: { border: '#d97706', color: '#fbbf24', leftBar: '#d97706' },
+  info:    { border: '#6366f1', color: '#818cf8', leftBar: '#6366f1' },
 };
 
 /* ── Context ─────────────────────────────────── */
@@ -84,12 +84,12 @@ export function ToastProvider({ children }) {
                 pointerEvents: 'all',
                 display: 'flex', alignItems: 'flex-start', gap: 10,
                 background: 'var(--surface, #1e2235)',
-                border: `1px solid ${c.border}`,
-                borderLeft: `4px solid ${c.color}`,
+                border: `1px solid var(--border, #2d3348)`,
+                borderLeft: `4px solid ${c.leftBar}`,
                 borderRadius: 10,
                 padding: '12px 14px',
                 minWidth: 280, maxWidth: 380,
-                boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
                 animation: 'toast-in 0.2s ease',
               }}
             >
