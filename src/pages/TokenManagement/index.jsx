@@ -128,71 +128,116 @@ export default function TokenManagement() {
   return (
     <div className="animate-in">
       {/* ── View Request Modal ── */}
-      {viewReq && (
-        <Modal
-          title="Token Request Details"
-          sub={`${viewReq.user?.fullName || '—'} · ${viewReq.tokenName || '—'} (${viewReq.ticker || ''})`}
-          onClose={() => setViewReq(null)}
-        >
-          {/* Screenshot */}
-          {viewReq.screenshotUrl && (
-            <a href={viewReq.screenshotUrl} target="_blank" rel="noreferrer" style={{ display: 'block', marginBottom: 16 }}>
-              <img
-                src={viewReq.screenshotUrl}
-                alt="Payment screenshot"
-                style={{ width: '100%', borderRadius: 8, border: '1px solid var(--border)', maxHeight: 260, objectFit: 'contain', background: 'var(--bg2)' }}
-              />
-            </a>
-          )}
-          <div className="kv" style={{ marginBottom: 16 }}>
-            <div className="kv-item"><div className="kv-label">Request ID</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{viewReq.id || viewReq._id}</div></div>
-            <div className="kv-item"><div className="kv-label">Investor</div><div className="kv-value">{viewReq.user?.fullName || '—'}</div></div>
-            <div className="kv-item"><div className="kv-label">Email</div><div className="kv-value">{viewReq.user?.email || '—'}</div></div>
-            <div className="kv-item"><div className="kv-label">Token</div><div className="kv-value">{viewReq.tokenName || '—'} ({viewReq.ticker || '—'})</div></div>
-            <div className="kv-item"><div className="kv-label">Investment Amount</div><div className="kv-value" style={{ color: 'var(--emerald)', fontWeight: 700 }}>${Number(viewReq.amountUsd || 0).toLocaleString()}</div></div>
-            <div className="kv-item"><div className="kv-label">Tokens Requested</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontWeight: 600 }}>{Number(viewReq.tokenQty || 0).toLocaleString()}</div></div>
-            <div className="kv-item"><div className="kv-label">Payment Method</div><div className="kv-value">{viewReq.method || '—'}</div></div>
-            <div className="kv-item"><div className="kv-label">Purchase Ref</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{viewReq.purchaseRef || '—'}</div></div>
-            <div className="kv-item"><div className="kv-label">Requested</div><div className="kv-value">{fmtDate(viewReq.createdAt)}</div></div>
-            <div className="kv-item"><div className="kv-label">Status</div><div className="kv-value"><Badge status={normalizeStatus(viewReq.status)} /></div></div>
-            {viewReq.reviewedBy && (
-              <>
-                <div className="kv-item"><div className="kv-label">Reviewed By</div><div className="kv-value">{viewReq.reviewedBy?.fullName || viewReq.reviewedBy}</div></div>
-                <div className="kv-item"><div className="kv-label">Reviewed At</div><div className="kv-value">{fmtDate(viewReq.reviewedAt)}</div></div>
-              </>
-            )}
-            {viewReq.adminNote && (
-              <div className="kv-item"><div className="kv-label">Admin Note</div><div className="kv-value">{viewReq.adminNote}</div></div>
-            )}
-            {viewReq.rejectionReason && (
-              <div className="kv-item"><div className="kv-label">Rejection Reason</div><div className="kv-value" style={{ color: 'var(--crimson)' }}>{viewReq.rejectionReason}</div></div>
-            )}
-            {viewReq.airdropReference && (
-              <div className="kv-item"><div className="kv-label">Airdrop Reference</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{viewReq.airdropReference}</div></div>
-            )}
-          </div>
-          {normalizeStatus(viewReq.status) === 'Pending' && (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                className="btn btn-success btn-sm"
-                disabled={!!actionLoading}
-                style={{ flex: 1 }}
-                onClick={() => { setApproveTarget(viewReq.id || viewReq._id); setViewReq(null); }}
-              >
-                <Icon n="check" size={13} /> Accept
-              </button>
-              <button
-                className="btn btn-danger btn-sm"
-                disabled={!!actionLoading}
-                style={{ flex: 1 }}
-                onClick={() => { setRejectTarget(viewReq.id || viewReq._id); setViewReq(null); }}
-              >
-                <Icon n="x" size={13} /> Reject
-              </button>
+      {viewReq && (() => {
+        const vStatus = normalizeStatus(viewReq.status);
+        const vColor = vStatus === 'Approved' ? 'var(--emerald)' : vStatus === 'Rejected' ? 'var(--red)' : 'var(--amber)';
+        const vBg = vStatus === 'Approved' ? 'rgba(5,150,105,0.08)' : vStatus === 'Rejected' ? 'rgba(220,38,38,0.08)' : 'rgba(217,119,6,0.08)';
+        return (
+          <Modal
+            title="Token Request"
+            sub={`${viewReq.user?.fullName || '—'} · ${viewReq.tokenName || '—'} (${viewReq.ticker || ''})`}
+            onClose={() => setViewReq(null)}
+          >
+            {/* Status banner */}
+            <div style={{ background: vBg, border: `1px solid ${vColor}33`, borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 12, color: 'var(--text3)' }}>Request #{String(viewReq.id || viewReq._id).slice(-8)}</span>
+              <span style={{ background: vColor, color: '#fff', borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700 }}>
+                {vStatus === 'Pending' ? '⏳' : vStatus === 'Approved' ? '✓' : '✕'} {vStatus}
+              </span>
             </div>
-          )}
-        </Modal>
-      )}
+
+            {/* Screenshot */}
+            {viewReq.screenshotUrl && (
+              <a href={viewReq.screenshotUrl} target="_blank" rel="noreferrer" style={{ display: 'block', marginBottom: 16, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                <img
+                  src={viewReq.screenshotUrl}
+                  alt="Payment screenshot"
+                  style={{ width: '100%', maxHeight: 240, objectFit: 'contain', background: 'var(--surface2)', display: 'block' }}
+                />
+                <div style={{ padding: '8px 12px', background: 'var(--surface2)', fontSize: 11, color: 'var(--text3)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Icon n="eye" size={11} /> View full screenshot ↗
+                </div>
+              </a>
+            )}
+
+            {/* Highlight: Amount + Qty */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div style={{ background: 'rgba(5,150,105,0.07)', border: '1px solid rgba(5,150,105,0.15)', borderRadius: 10, padding: '12px 14px', textAlign: 'center' }}>
+                <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Investment</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--emerald)', fontFamily: 'DM Mono', lineHeight: 1 }}>${Number(viewReq.amountUsd || 0).toLocaleString()}</div>
+                <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 3 }}>USD</div>
+              </div>
+              <div style={{ background: 'rgba(92,39,254,0.06)', border: '1px solid rgba(92,39,254,0.12)', borderRadius: 10, padding: '12px 14px', textAlign: 'center' }}>
+                <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Tokens</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#5C27FE', fontFamily: 'DM Mono', lineHeight: 1 }}>{Number(viewReq.tokenQty || 0).toLocaleString()}</div>
+                <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 3 }}>{viewReq.ticker || 'tokens'}</div>
+              </div>
+            </div>
+
+            {/* Details grid */}
+            <div className="kv" style={{ marginBottom: 14 }}>
+              <div className="kv-item"><div className="kv-label">Investor</div><div className="kv-value">{viewReq.user?.fullName || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Email</div><div className="kv-value" style={{ fontSize: 12 }}>{viewReq.user?.email || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Token</div><div className="kv-value">{viewReq.tokenName || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Ticker</div><div className="kv-value" style={{ fontFamily: 'DM Mono' }}>{viewReq.ticker || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Payment Method</div><div className="kv-value">{viewReq.method || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Purchase Ref</div><div className="kv-value" style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{viewReq.purchaseRef || '—'}</div></div>
+              <div className="kv-item"><div className="kv-label">Requested</div><div className="kv-value">{fmtDate(viewReq.createdAt)}</div></div>
+              {viewReq.reviewedBy && (
+                <div className="kv-item"><div className="kv-label">Reviewed By</div><div className="kv-value">{viewReq.reviewedBy?.fullName || viewReq.reviewedBy}</div></div>
+              )}
+              {viewReq.reviewedAt && (
+                <div className="kv-item"><div className="kv-label">Reviewed At</div><div className="kv-value">{fmtDate(viewReq.reviewedAt)}</div></div>
+              )}
+            </div>
+
+            {/* Notes / extras */}
+            {(viewReq.adminNote || viewReq.rejectionReason || viewReq.airdropReference) && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                {viewReq.adminNote && (
+                  <div style={{ background: 'var(--surface2)', borderRadius: 8, padding: '10px 12px', fontSize: 13 }}>
+                    <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Admin Note · </span>
+                    {viewReq.adminNote}
+                  </div>
+                )}
+                {viewReq.rejectionReason && (
+                  <div style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: 'var(--red)' }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Rejection Reason · </span>
+                    {viewReq.rejectionReason}
+                  </div>
+                )}
+                {viewReq.airdropReference && (
+                  <div style={{ background: 'rgba(92,39,254,0.05)', border: '1px solid rgba(92,39,254,0.12)', borderRadius: 8, padding: '10px 12px', fontSize: 13 }}>
+                    <span style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Airdrop Ref · </span>
+                    <span style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{viewReq.airdropReference}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {vStatus === 'Pending' && (
+              <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
+                <button
+                  className="btn btn-success btn-sm"
+                  disabled={!!actionLoading}
+                  style={{ flex: 1, justifyContent: 'center' }}
+                  onClick={() => { setApproveTarget(viewReq.id || viewReq._id); setViewReq(null); }}
+                >
+                  <Icon n="check" size={13} /> Approve
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  disabled={!!actionLoading}
+                  style={{ flex: 1, justifyContent: 'center' }}
+                  onClick={() => { setRejectTarget(viewReq.id || viewReq._id); setViewReq(null); }}
+                >
+                  <Icon n="x" size={13} /> Reject
+                </button>
+              </div>
+            )}
+          </Modal>
+        );
+      })()}
 
       {/* ── Approve Modal ── */}
       {approveTarget && (
@@ -417,133 +462,210 @@ export default function TokenManagement() {
       ══════════════════════════════════════════ */}
       {pageTab === 'Token Requests' && (
         <>
-          {/* Filter tabs */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-            {['All', 'Pending', 'Approved', 'Rejected'].map((f) => (
-              <button
-                key={f}
-                className={`btn btn-sm ${reqFilter === f ? 'btn-primary' : ''}`}
-                style={reqFilter !== f ? { background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text2)' } : {}}
-                onClick={() => setReqFilter(f)}
-              >
-                {f}
-                {f === 'Pending' && pendingReqs.length > 0 && (
-                  <span style={{ marginLeft: 6, background: 'rgba(217,119,6,0.15)', color: 'var(--amber)', borderRadius: 10, padding: '1px 6px', fontSize: 11 }}>{pendingReqs.length}</span>
-                )}
-              </button>
-            ))}
+          {/* ── Toolbar ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+            {/* Filter pills */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {[
+                { label: 'All',      count: requests.length },
+                { label: 'Pending',  count: pendingReqs.length },
+                { label: 'Approved', count: approvedReqs.length },
+                { label: 'Rejected', count: rejectedReqs.length },
+              ].map(({ label, count }) => {
+                const active = reqFilter === label;
+                const accent = label === 'Pending' ? 'var(--amber)' : label === 'Approved' ? 'var(--emerald)' : label === 'Rejected' ? 'var(--red)' : 'var(--accent)';
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setReqFilter(label)}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      cursor: 'pointer', border: 'none', fontFamily: 'inherit', transition: 'all 0.15s',
+                      background: active ? accent : 'var(--surface)',
+                      color: active ? '#fff' : 'var(--text2)',
+                      boxShadow: active ? `0 2px 8px ${accent}44` : '0 1px 3px rgba(0,0,0,0.06)',
+                      outline: active ? 'none' : '1px solid var(--border)',
+                    }}
+                  >
+                    {label}
+                    {count > 0 && (
+                      <span style={{
+                        background: active ? 'rgba(255,255,255,0.25)' : 'var(--surface2)',
+                        color: active ? '#fff' : 'var(--text3)',
+                        borderRadius: 20, padding: '1px 7px', fontSize: 11, fontWeight: 700,
+                      }}>{count}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Refresh */}
             <button
               className="btn btn-sm"
-              style={{ marginLeft: 'auto', background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text2)' }}
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text2)', gap: 6 }}
               onClick={fetchRequests}
               disabled={reqLoading}
             >
-              <Icon n="refresh" size={12} /> Refresh
+              <Icon n="refresh" size={13} /> Refresh
             </button>
           </div>
 
+          {/* ── Summary strip ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12, marginBottom: 20 }}>
+            {[
+              { label: 'Total Requests', value: requests.length, color: 'var(--accent)', bg: 'rgba(26,86,219,0.07)' },
+              { label: 'Pending Review', value: pendingReqs.length, color: 'var(--amber)', bg: 'rgba(217,119,6,0.07)' },
+              { label: 'Approved', value: approvedReqs.length, color: 'var(--emerald)', bg: 'rgba(5,150,105,0.07)' },
+              { label: 'Rejected', value: rejectedReqs.length, color: 'var(--red)', bg: 'rgba(220,38,38,0.07)' },
+            ].map((s) => (
+              <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.color}22`, borderRadius: 12, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{s.label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: 'DM Mono', lineHeight: 1 }}>{s.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── List ── */}
           {reqLoading ? (
             <div className="card" style={{ padding: 48, textAlign: 'center', color: 'var(--text3)' }}>Loading token requests…</div>
           ) : reqError ? (
             <div className="card" style={{ padding: 48, textAlign: 'center' }}>
-              <div style={{ color: 'var(--crimson)', marginBottom: 12 }}>{reqError}</div>
+              <div style={{ color: 'var(--red)', marginBottom: 12, fontWeight: 500 }}>{reqError}</div>
               <button className="btn btn-primary btn-sm" onClick={fetchRequests}>Retry</button>
             </div>
           ) : displayedReqs.length === 0 ? (
-            <div className="card" style={{ padding: 48, textAlign: 'center', color: 'var(--text3)' }}>
-              No {reqFilter !== 'All' ? reqFilter.toLowerCase() + ' ' : ''}token requests found.
+            <div className="card" style={{ padding: 56, textAlign: 'center' }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>📭</div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text2)', marginBottom: 6 }}>No requests found</div>
+              <div style={{ fontSize: 13, color: 'var(--text3)' }}>No {reqFilter !== 'All' ? reqFilter.toLowerCase() + ' ' : ''}token requests at the moment.</div>
             </div>
           ) : (
-            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Request ID</th>
-                      <th>Investor</th>
-                      <th>Token</th>
-                      <th>Amount (USD)</th>
-                      <th>Token Qty</th>
-                      <th>Purchase Ref</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayedReqs.map((r) => {
-                      const id = r._id || r.id;
-                      const name = r.user?.fullName || '—';
-                      const email = r.user?.email || '';
-                      const status = normalizeStatus(r.status);
-                      const isPending = status === 'Pending';
-                      return (
-                        <tr key={id}>
-                          <td style={{ fontFamily: 'DM Mono', fontSize: 11, color: 'var(--text3)' }}>{String(id).slice(-8)}</td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                              <Initials name={name} gradient="linear-gradient(135deg,#5C27FE,#DEC7FF)" />
-                              <div>
-                                <div style={{ fontWeight: 500, fontSize: 13 }}>{name}</div>
-                                {email && <div style={{ fontSize: 11, color: 'var(--text3)' }}>{email}</div>}
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div style={{ fontWeight: 600, fontSize: 13 }}>{r.tokenName || '—'}</div>
-                            <div style={{ fontFamily: 'DM Mono', fontSize: 11, color: 'var(--text3)' }}>{r.ticker || ''}</div>
-                          </td>
-                          <td style={{ fontFamily: 'DM Mono', fontWeight: 700, color: 'var(--emerald)' }}>
-                            ${Number(r.amountUsd || 0).toLocaleString()}
-                          </td>
-                          <td style={{ fontFamily: 'DM Mono', fontSize: 12 }}>
-                            {Number(r.tokenQty || 0).toLocaleString()}
-                          </td>
-                          <td className="td-muted" style={{ fontFamily: 'DM Mono', fontSize: 11 }}>{r.purchaseRef || '—'}</td>
-                          <td className="td-muted">{fmtDate(r.createdAt)}</td>
-                          <td>
-                            <Badge status={normalizeStatus(r.status)} />
-                            {r.reviewedBy && (
-                              <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 3, whiteSpace: 'nowrap' }}>
-                                {fmtDate(r.reviewedAt)}
-                              </div>
-                            )}
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap' }}>
-                              <button
-                                className="btn btn-sm"
-                                style={{ background: 'var(--bg2)', border: '1px solid var(--border)', color: 'var(--text2)', padding: '4px 10px' }}
-                                onClick={() => setViewReq(r)}
-                              >
-                                <Icon n="eye" size={12} /> View
-                              </button>
-                              {isPending && (
-                                <>
-                                  <button
-                                    className="btn btn-success btn-sm"
-                                    disabled={!!actionLoading}
-                                    onClick={() => setApproveTarget(id)}
-                                  >
-                                    {actionLoading === id + 'accept' ? '…' : <><Icon n="check" size={12} /> Accept</>}
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm"
-                                    disabled={!!actionLoading}
-                                    onClick={() => { setRejectTarget(id); setRejectReason(''); setRejectNote(''); }}
-                                  >
-                                    {actionLoading === id + 'reject' ? '…' : <><Icon n="x" size={12} /> Reject</>}
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {displayedReqs.map((r) => {
+                const id = r._id || r.id;
+                const name = r.user?.fullName || '—';
+                const email = r.user?.email || '';
+                const status = normalizeStatus(r.status);
+                const isPending = status === 'Pending';
+                const statusColor = status === 'Approved' ? 'var(--emerald)' : status === 'Rejected' ? 'var(--red)' : 'var(--amber)';
+                const statusBg = status === 'Approved' ? 'rgba(5,150,105,0.08)' : status === 'Rejected' ? 'rgba(220,38,38,0.08)' : 'rgba(217,119,6,0.08)';
+
+                return (
+                  <div
+                    key={id}
+                    style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 14,
+                      padding: '16px 20px',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr auto',
+                      gap: 16,
+                      transition: 'box-shadow 0.15s, border-color 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = 'var(--accent)44'; }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                  >
+                    {/* Left: info grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '10px 20px', alignItems: 'start' }}>
+
+                      {/* Investor */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                        <Initials name={name} gradient="linear-gradient(135deg,#5C27FE,#DEC7FF)" />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
+                          {email && <div style={{ fontSize: 11, color: 'var(--text3)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</div>}
+                          <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 2, fontFamily: 'DM Mono' }}>#{String(id).slice(-8)}</div>
+                        </div>
+                      </div>
+
+                      {/* Token */}
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>Token</div>
+                        <div style={{ fontWeight: 700, fontSize: 13 }}>{r.tokenName || '—'}</div>
+                        <div style={{ fontFamily: 'DM Mono', fontSize: 11, color: 'var(--text3)' }}>{r.ticker || ''}</div>
+                      </div>
+
+                      {/* Amount */}
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>Investment</div>
+                        <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--emerald)', fontFamily: 'DM Mono' }}>${Number(r.amountUsd || 0).toLocaleString()}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text3)' }}>USD</div>
+                      </div>
+
+                      {/* Token qty */}
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>Token Qty</div>
+                        <div style={{ fontWeight: 600, fontSize: 13, fontFamily: 'DM Mono' }}>{Number(r.tokenQty || 0).toLocaleString()}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text3)' }}>{r.ticker || 'tokens'}</div>
+                      </div>
+
+                      {/* Ref & Date */}
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>Payment Ref</div>
+                        <div style={{ fontFamily: 'DM Mono', fontSize: 12, color: 'var(--text2)' }}>{r.purchaseRef || '—'}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{fmtDate(r.createdAt)}</div>
+                      </div>
+
+                      {/* Method */}
+                      {r.method && (
+                        <div>
+                          <div style={{ fontSize: 10, color: 'var(--text3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>Method</div>
+                          <div style={{ fontSize: 12, color: 'var(--text2)', fontWeight: 500 }}>{r.method}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: status + actions */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', gap: 10, minWidth: 0 }}>
+                      {/* Status */}
+                      <div style={{ background: statusBg, color: statusColor, border: `1px solid ${statusColor}33`, borderRadius: 20, padding: '4px 12px', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {status === 'Pending' ? '⏳' : status === 'Approved' ? '✓' : '✕'} {status}
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'stretch', width: '100%', minWidth: 110 }}>
+                        <button
+                          className="btn btn-sm"
+                          style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text2)', justifyContent: 'center', width: '100%' }}
+                          onClick={() => setViewReq(r)}
+                        >
+                          <Icon n="eye" size={12} /> View
+                        </button>
+                        {isPending && (
+                          <>
+                            <button
+                              className="btn btn-success btn-sm"
+                              disabled={!!actionLoading}
+                              style={{ justifyContent: 'center', width: '100%' }}
+                              onClick={() => setApproveTarget(id)}
+                            >
+                              {actionLoading === id + 'accept' ? '…' : <><Icon n="check" size={12} /> Approve</>}
+                            </button>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              disabled={!!actionLoading}
+                              style={{ justifyContent: 'center', width: '100%' }}
+                              onClick={() => { setRejectTarget(id); setRejectReason(''); setRejectNote(''); }}
+                            >
+                              {actionLoading === id + 'reject' ? '…' : <><Icon n="x" size={12} /> Reject</>}
+                            </button>
+                          </>
+                        )}
+                        {!isPending && r.reviewedBy && (
+                          <div style={{ fontSize: 10, color: 'var(--text3)', textAlign: 'center', lineHeight: 1.4 }}>
+                            {fmtDate(r.reviewedAt)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </>

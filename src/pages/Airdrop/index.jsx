@@ -9,7 +9,7 @@ export default function Airdrop() {
   const [users, setUsers]               = useState([]);
   const [tokens, setTokens]             = useState([]);
   const [selectedTokenId, setSelectedTokenId] = useState('');
-  const [recipient, setRecipient]       = useState('all');
+  const [recipient, setRecipient]       = useState('');
   const [investAmount, setInvestAmount] = useState('');
   const [tokenPrice, setTokenPrice]     = useState('');
   const [tag, setTag]                   = useState('Airdrop');
@@ -82,10 +82,10 @@ export default function Airdrop() {
   // ── Step 1: validate → POST /admin/direct-airdrops/otp/send ─────────────────────
   const handleRequestOtp = async () => {
     if (!selectedTokenId) { setError('Please select a token.'); return; }
-    if (!recipient) { setError('Please select an investor.'); return; }
+    if (!recipient) { setError('Please select a user.'); return; }
     if (kycBlocked) { setError(`Cannot send airdrop — ${selectedUser?.fullName || selectedUser?.name}'s KYC is not approved (status: ${selectedKyc || 'Not Started'}).`); return; }
-    if (!investAmount || investNum <= 0) { setError('Please enter a valid investment amount.'); return; }
-    if (tokenQty <= 0) { setError('Investment amount is too small for the given token price.'); return; }
+    if (!investAmount || investNum <= 0) { setError('Please enter a valid airdrop amount.'); return; }
+    if (tokenQty <= 0) { setError('Airdrop amount is too small for the given token price.'); return; }
     setError(null);
     setOtpSending(true);
     try {
@@ -148,7 +148,7 @@ export default function Airdrop() {
     setOtpError(null);
     try {
       await adminService.verifyDirectAirdropOtp(pendingRequestId, entered);
-      const recipientLabel = selectedUser ? (selectedUser.fullName || selectedUser.name) : 'the investor';
+      const recipientLabel = selectedUser ? (selectedUser.fullName || selectedUser.name) : 'the selected user';
       setOtpModal(false);
       setPendingRequestId(null);
       setSuccess(`Airdrop of ${tokenQty.toLocaleString()} tokens sent to ${recipientLabel} successfully.`);
@@ -220,7 +220,7 @@ export default function Airdrop() {
       <div className="page-header">
         <div>
           <div className="page-title">Airdrop System</div>
-          <div className="page-sub">Distribute tokens to investors</div>
+          <div className="page-sub">Send tokens to a single user</div>
         </div>
       </div>
 
@@ -265,7 +265,7 @@ export default function Airdrop() {
               value={recipient}
               onChange={(e) => { setRecipient(e.target.value); setError(null); setSuccess(null); }}
             >
-              <option value="">— Select an investor —</option>
+              <option value="">— Select a user —</option>
               {users.map((u) => {
                 const kyc = u.kycStatus || 'Not Started';
                 const approved = kyc.toLowerCase() === 'approved' || kyc.toLowerCase() === 'verified';
@@ -291,7 +291,7 @@ export default function Airdrop() {
           </div>
           <div style={{ marginBottom: 8 }}>
             <label style={{ fontSize: 12, color: 'var(--text2)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
-              Investment Amount (USD)
+              Airdrop Amount (USD)
             </label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text3)', fontSize: 13, pointerEvents: 'none' }}>$</span>
@@ -325,7 +325,7 @@ export default function Airdrop() {
             </div>
             {investNum > 0 && priceNum > 0 && (
               <div style={{ marginTop: 8, padding: '8px 12px', background: 'var(--bg2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text2)' }}>Tokens each investor will receive</span>
+                <span style={{ color: 'var(--text2)' }}>Tokens this user will receive</span>
                 <span style={{ fontFamily: 'DM Mono', fontWeight: 700, color: 'var(--accent)', fontSize: 15 }}>{tokenQty.toLocaleString()}</span>
               </div>
             )}
@@ -344,7 +344,7 @@ export default function Airdrop() {
           {/* Notes */}
           <div style={{ marginBottom: 18 }}>
             <label style={{ fontSize: 12, color: 'var(--text2)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
-              Campaign Notes <span style={{ color: 'var(--text3)', fontWeight: 400 }}>(optional)</span>
+              Airdrop Note <span style={{ color: 'var(--text3)', fontWeight: 400 }}>(optional)</span>
             </label>
             <textarea
               className="filter-input"
@@ -359,11 +359,11 @@ export default function Airdrop() {
           {investNum > 0 && priceNum > 0 && tokenQty > 0 && (
             <div style={{ background: 'var(--bg2)', borderRadius: 'var(--radius)', padding: 14, marginBottom: 16, border: '1px solid var(--border)' }}>
               <div className="info-row">
-                <span className="info-label">Investment per investor</span>
+                <span className="info-label">Airdrop amount</span>
                 <span style={{ fontWeight: 600, fontFamily: 'DM Mono' }}>${investNum.toLocaleString()}</span>
               </div>
               <div className="info-row">
-                <span className="info-label">Tokens per investor</span>
+                <span className="info-label">Tokens to send</span>
                 <span style={{ fontWeight: 600, fontFamily: 'DM Mono' }}>{tokenQty.toLocaleString()}</span>
               </div>
             </div>
@@ -388,7 +388,7 @@ export default function Airdrop() {
             disabled={otpSending || kycBlocked}
           >
             <Icon n="airdrop" size={14} />
-            {otpSending ? 'Sending OTP…' : `Send Airdrop to ${selectedUser ? (selectedUser.fullName || selectedUser.name) : 'Selected Investor'}`}
+            {otpSending ? 'Sending OTP…' : `Send Airdrop to ${selectedUser ? (selectedUser.fullName || selectedUser.name) : 'Selected User'}`}
           </button>
         </div>
       </div>
@@ -441,8 +441,13 @@ export default function Airdrop() {
                         <td><span className="badge badge-gray">{h.airdropType || '—'}</span></td>
                         <td style={{ fontFamily: 'DM Mono', fontSize: 12 }}>{h.reference || '—'}</td>
                         <td><span className={badgeClass}>{status}</span></td>
-                        <td style={{ fontSize: 12, color: 'var(--text3)' }}>
-                          {h.createdAt ? new Date(h.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                        <td style={{ fontSize: 12, color: 'var(--text3)', whiteSpace: 'nowrap' }}>
+                          {h.createdAt ? (
+                            <>
+                              <div>{new Date(h.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                              <div style={{ fontSize: 11, color: 'var(--text3)' }}>{new Date(h.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+                            </>
+                          ) : '—'}
                         </td>
                         <td>
                           <button className="btn" style={{ fontSize: 12, padding: '4px 10px' }} onClick={() => openView(h._id || h.id)}>
